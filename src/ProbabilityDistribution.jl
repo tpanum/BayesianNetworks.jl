@@ -8,7 +8,8 @@ type ProbabilityDistribution{T <: FloatingPoint, K}
         if sum(_ps) != 1
             throw("Probability Distributions must sum to 1")
         end
-        new(_ps, sort(_ss))
+        order=sortperm(_ss)
+        new(_ps[order], _ss[order])
     end
 end
 
@@ -24,6 +25,13 @@ end
 
 function length(pd::ProbabilityDistribution)
     length(pd.ps)
+end
+
+function getindex{T,K}(pd::ProbabilityDistribution{T,K}, key::K)
+    if !(key in pd.states)
+        throw("Invalid key")
+    end
+    pd.ps[key .== pd.states]
 end
 
 function ==(pd1::ProbabilityDistribution, pd2::ProbabilityDistribution)
