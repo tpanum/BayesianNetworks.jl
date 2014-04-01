@@ -5,7 +5,13 @@ type BayesianNode{V}
     states::Array{V,1}
     CPT::CPT
        
-    BayesianNode(i::Int, l::ASCIIString, s::V, ss::Array{V,1}, c::CPT) = new(i,l,s,ss,c)    
+    function BayesianNode(i::Int, l::ASCIIString, s::V, ss::Array{V,1}, c::CPT) 
+        if s in ss
+            new(i,l,s,ss,c)
+        else 
+            throw("Set state is not in the set of allowed states for the node")
+        end
+    end    
 end
 
 BayesianNode{V}(i::Int, l::ASCIIString, s::V, ss::Array{V,1}, c::CPT) = BayesianNode{V}(i,l,s,ss,c)  
