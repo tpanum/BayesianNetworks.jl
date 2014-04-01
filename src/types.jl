@@ -14,6 +14,14 @@ end
 
 ProbabilityDistribution{T,K}(ps::Array{T,1}, ss::Array{K,1}) = ProbabilityDistribution{T,K}(ps, ss)
 
+function states(pd::ProbabilityDistribution)
+    pd.states
+end
+
+type CPT
+    PDs::Array{ProbabilityDistribution,1}
+end
+
 type BayesianNode
 	index::Int
     state::Int
