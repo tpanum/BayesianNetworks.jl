@@ -1,5 +1,5 @@
 type BayesianNode
-	index::Int
+    index::Int
     state::Int
     CPT::CPT
        
@@ -8,7 +8,7 @@ end
 
 type BayesianNetwork <: AbstractGraph{BayesianNode, ExEdge{BayesianNode}}
     nodes::Array{BayesianNode,1}
-    edges::Array{ExEdge{BayesianNode},1}  
+    edges::Array{ExEdge{BayesianNode},1}
 
     function BayesianNetwork(n::Array{BayesianNode,1}, e::Array{ExEdge{BayesianNode},1}; set_ids = true)
         if set_ids == true
@@ -81,4 +81,3 @@ nodes(g::BayesianNetwork) = g.nodes
 
 num_edges(g::BayesianNetwork) = length(g.edges)
 edges(g::BayesianNetwork) = g.edges
-
