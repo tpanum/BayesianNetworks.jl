@@ -23,6 +23,14 @@ type CPT{F <: FloatingPoint,S}
     end
 end
 
+function states(cpt::CPT)
+    cpt.states
+end
+
+function getindex(cpt::CPT, i::Integer)
+    ProbabilityDistribution(Ps[i,:],states(cpt))
+end
+
 type BayesianNode
 	index::Int
     state::Int

@@ -1,3 +1,5 @@
+import Base.length
+
 type ProbabilityDistribution{T <: FloatingPoint, K}
     ps::Array{T,1}
     states::Array{K,1}
