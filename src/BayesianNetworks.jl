@@ -10,6 +10,7 @@ using Graphs
 
 include("ProbabilityDistribution.jl")
 include("types.jl")
+include("show.jl")
 
 ##############################################################################
 ##

@@ -11,7 +11,26 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, ExEdge{BayesianNode}}
     nodes::Array{BayesianNode,1}
     edges::Array{ExEdge{BayesianNode},1}
 
-    BayesianNetwork(n::Array{BayesianNode,1}, e::Array{ExEdge{BayesianNode},1}) = new(n,e)  
+    #BayesianNetwork(n::Array{BayesianNode,1}, e::Array{ExEdge{BayesianNode},1}) = new(n,e)  
+
+    function BayesianNetwork(n::Array{BayesianNode,1}, e::Array{ExEdge{BayesianNode},1}; set_ids = true)
+        if set_ids == true
+            for i = 1:length(n)
+                if i != n[i].index
+                    nindex = n[i].index
+                    for j = 1:length(e)
+                        if e[j].target == nindex
+                            e.target = i
+                        end
+                    end
+                    n[i].index = i
+                end
+            end
+            new(n,e)
+        else
+            new(n,e)
+        end
+    end
 end
 
 function BayesianEdge(i::Int, s::BayesianNode, t::BayesianNode)
