@@ -6,7 +6,7 @@ type ProbabilityDistribution{T <: FloatingPoint, K}
         if sum(_ps) != 1
             throw("Probability Distributions must sum to 1")
         end
-        new(_ps, _ss)
+        new(_ps, sort(_ss))
     end
 end
 
@@ -14,4 +14,16 @@ ProbabilityDistribution{T,K}(ps::Array{T,1}, ss::Array{K,1}) = ProbabilityDistri
 
 function states(pd::ProbabilityDistribution)
     pd.states
+end
+
+function probabilities(pd::ProbabilityDistribution)
+    pd.ps
+end
+
+function length(pd::ProbabilityDistribution)
+    length(pd.ps)
+end
+
+function ==(pd1::ProbabilityDistribution, pd2::ProbabilityDistribution)
+    length(setdiff(Set(states(pd1)),Set(states(pd2)))) == 0
 end

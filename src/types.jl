@@ -1,25 +1,26 @@
-#using Graphs
+type CPT{F <: FloatingPoint,S}
+    Ps::Array{F,2}
+    states::Array{S,1}
 
-type ProbabilityDistribution{T <: FloatingPoint, K}
-    ps::Array{T,1}
-    states::Array{K,1}
-
-    function ProbabilityDistribution(_ps::Array{T,1}, _ss::Array{K,1})
-        if sum(_ps) != 1
-            throw("Probability Distributions must sum to 1")
+    function CPT(_PDs::Array{ProbabilityDistribution,1})
+        _lPDs=length(_PDs)
+        
+        for i=2:_lPDs
+            if _PDs[1] != _PDs[i]
+                throw("State mismatch: CPT's must contain ProbabilityDistributions of the same type")
+            end
         end
-        new(_ps, _ss)
+
+        s=states(_PDs[1])
+        Pl=length(_PDs[1])
+        Ps=Array(Float64,length(_PDs),Pl)
+
+        for i=1:_lPDs
+            Ps[1,:] = probabilities(PDs[i])
+        end
+        
+        new(Ps, s)
     end
-end
-
-ProbabilityDistribution{T,K}(ps::Array{T,1}, ss::Array{K,1}) = ProbabilityDistribution{T,K}(ps, ss)
-
-function states(pd::ProbabilityDistribution)
-    pd.states
-end
-
-type CPT
-    PDs::Array{ProbabilityDistribution,1}
 end
 
 type BayesianNode
