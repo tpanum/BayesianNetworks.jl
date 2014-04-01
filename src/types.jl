@@ -1,16 +1,20 @@
-type BayesianNode
+type BayesianNode{V}
     index::Int
-    state::Int
+    label::ASCIIString
+    state::V
+    states::Array{V,1}
     CPT::CPT
        
-    BayesianNode(i::Int, s::Int, c::CPT) = new(i,s,c)    
+    BayesianNode(i::Int, l::ASCIIString, s::V, ss::Array{V,1}, c::CPT) = new(i,l,s,ss,c)    
 end
 
-type BayesianNetwork <: AbstractGraph{BayesianNode, ExEdge{BayesianNode}}
-    nodes::Array{BayesianNode,1}
-    edges::Array{ExEdge{BayesianNode},1}
+BayesianNode{V}(i::Int, l::ASCIIString, s::V, ss::Array{V,1}, c::CPT) = BayesianNode{V}(i,l,s,ss,c)  
 
-    function BayesianNetwork(n::Array{BayesianNode,1}, e::Array{ExEdge{BayesianNode},1}; set_ids = true)
+type BayesianNetwork{V} <: AbstractGraph{BayesianNode{V}, ExEdge{BayesianNode{V}}}
+    nodes::Array{BayesianNode{V},1}
+    edges::Array{ExEdge{BayesianNode{V}},1}
+
+    function BayesianNetwork(n::Array{BayesianNode{V},1}, e::Array{ExEdge{BayesianNode{V}},1}; set_ids = true)
         if set_ids == true
             for i = 1:length(n)
                 if i != n[i].index
@@ -32,6 +36,8 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, ExEdge{BayesianNode}}
         end
     end
 end
+
+BayesianNetwork{V}(n::Array{BayesianNode{V},1}, e::Array{ExEdge{BayesianNode{V}},1}; set_ids = true) = BayesianNetwork{V}(n,e)
 
 function BayesianEdge(i::Int, s::BayesianNode, t::BayesianNode)
 	e = ExEdge(i,s,t)
