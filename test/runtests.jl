@@ -1,3 +1,4 @@
+using Graphs
 using BayesianNetworks
 using Base.Test
 
