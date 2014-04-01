@@ -35,3 +35,7 @@ add_edge!(b1,a1,a2)
 @test e1.target.index == 1
 @test in_neighbors(a2,b1)[1].index == 1
 @test out_neighbors(a1,b1)[1].index == 2
+
+@test_throws BayesianNode(1,"name", 1, ["hej","hej"],CPT(["navn1"],[ProbabilityDistribution([0.5,0.5],[1,2])]))
+@test_throws BayesianNode(1,"name", 1, [2,3],CPT(["navn1"],[ProbabilityDistribution([0.5,0.5],[1,2])]))
+
