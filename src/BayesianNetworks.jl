@@ -18,6 +18,8 @@ include("types.jl")
 ##############################################################################
 
 export ProbabilityDistribution,
-       states
+       states,
+       probabilities,
+       CPT
 
 end
