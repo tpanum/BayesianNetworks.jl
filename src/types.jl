@@ -1,5 +1,5 @@
 using Graphs
-using Base.Test
+#include("show.jl")
 include("ProbabilityDistribution.jl")
 
 type BayesianNode
@@ -51,17 +51,3 @@ nodes(g::BayesianNetwork) = g.nodes
 num_edges(g::BayesianNetwork) = length(g.edges)
 edges(g::BayesianNetwork) = g.edges
 
-include("show.jl")
-
-b = BayesianNetwork(Array(BayesianNode,0), Array(ExEdge{BayesianNode},0))
-a1 = BayesianNode(1,1,Array(ExEdge{BayesianNode},0),ProbabilityDistribution([0.5,0.5],[1,2]))
-a2 = BayesianNode(2,1,Array(ExEdge{BayesianNode},0),ProbabilityDistribution([0.5,0.5],[1,2]))
-
-add_node!(b,a1)
-add_node!(b,a2)
-add_edge!(b,a1,a2)
-
-
-#a1 = BayesianNode(1,1,Array(ExEdge{BayesianNode},0),ProbabilityDistribution([0.5,0.5],[1,2])) 
-#a2 = BayesianNode(2,1,Array(ExEdge{BayesianNode},0),ProbabilityDistribution([0.5,0.5],[1,2])) 
-#e1 = BayesianEdge(1,a1,a2);
