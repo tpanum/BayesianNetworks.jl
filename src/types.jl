@@ -1,23 +1,23 @@
 type BayesianNode
-	index::Int
+    index::Int
     state::Int
     ingoingEdges::Array{ExEdge{BayesianNode},1}
     CPT::ProbabilityDistribution
-       
-    BayesianNode(i::Int, s::Int, ie::Array{ExEdge{BayesianNode},1}, c::ProbabilityDistribution) = new(i,s,ie, c)    
+
+    BayesianNode(i::Int, s::Int, ie::Array{ExEdge{BayesianNode},1}, c::ProbabilityDistribution) = new(i,s,ie, c)
 end
 
 type BayesianNetwork <: AbstractGraph{BayesianNode, ExEdge{BayesianNode}}
     nodes::Array{BayesianNode,1}
     edges::Array{ExEdge{BayesianNode},1}
 
-    BayesianNetwork(n::Array{BayesianNode,1}, e::Array{ExEdge{BayesianNode},1}) = new(n,e)  
+    BayesianNetwork(n::Array{BayesianNode,1}, e::Array{ExEdge{BayesianNode},1}) = new(n,e)
 end
 
 function BayesianEdge(i::Int, s::BayesianNode, t::BayesianNode)
-	e = ExEdge(i,s,t)
-	push!(t.ingoingEdges, e)
-	e
+    e = ExEdge(i,s,t)
+    push!(t.ingoingEdges, e)
+    e
 end
 
 function add_node!(g::BayesianNetwork, n::BayesianNode)
@@ -46,4 +46,3 @@ nodes(g::BayesianNetwork) = g.nodes
 
 num_edges(g::BayesianNetwork) = length(g.edges)
 edges(g::BayesianNetwork) = g.edges
-
