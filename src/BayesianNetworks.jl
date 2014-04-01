@@ -20,6 +20,16 @@ include("types.jl")
 export ProbabilityDistribution,
        states,
        probabilities,
-       CPT
+       CPT,
+       BayesianNode,
+       BayesianNetwork,
+       BayesianEdge,
+       add_node!,
+       add_edge!,
+       node_index,
+       num_nodes,
+       nodes,
+       num_edges,
+       edges
 
 end

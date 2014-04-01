@@ -8,4 +8,4 @@ add_edge!(b,a1,a2)
 
 @test num_edges(b) == 1
 @test num_nodes(b) == 2
-@test Base.length(b.nodes[node_index(a2)].ingoingEdges) == 1
+@test length(b.nodes[node_index(a2)].ingoingEdges) == 1
