@@ -1,14 +1,14 @@
 b1 = BayesianNetwork(Array(BayesianNode,0), Array(ExEdge{BayesianNode},0))
-a1 = BayesianNode(1,1,CPT([ProbabilityDistribution([0.5,0.5],[1,2])]))
-a2 = BayesianNode(2,1,CPT([ProbabilityDistribution([0.5,0.5],[1,2])]))
+a1 = BayesianNode(1,1,CPT(["navn1"],[ProbabilityDistribution([0.5,0.5],[1,2])]))
+a2 = BayesianNode(2,1,CPT(["navn2"],[ProbabilityDistribution([0.5,0.5],[1,2])]))
 
-a3 = BayesianNode(1,1,CPT([ProbabilityDistribution([0.5,0.5],[1,2])]))
-a4 = BayesianNode(2,1,CPT([ProbabilityDistribution([0.5,0.5],[1,2])]))
+a3 = BayesianNode(1,1,CPT(["navn1"],[ProbabilityDistribution([0.5,0.5],[1,2])]))
+a4 = BayesianNode(2,1,CPT(["navn2"],[ProbabilityDistribution([0.5,0.5],[1,2])]))
 e1 = BayesianEdge(1,a3,a4)
 
-a5 = BayesianNode(1,1,CPT([ProbabilityDistribution([0.5,0.5],[1,2])]))
-a6 = BayesianNode(2,1,CPT([ProbabilityDistribution([0.5,0.5],[1,2])]))
-e2 = BayesianEdge(1,a5,a6)
+a5 = BayesianNode(1,1,CPT(["navn1"],[ProbabilityDistribution([0.5,0.5],[1,2])]))
+a6 = BayesianNode(2,1,CPT(["navn2"],[ProbabilityDistribution([0.5,0.5],[1,2])]))
+e2 = BayesianEdge(2,a5,a6)
 
 @test a3.index == 1
 @test a4.index == 2
@@ -20,6 +20,7 @@ d = BayesianNetwork([a5,a6], [e2])
 @test a5.index == 1
 @test a6.index == 2
 @test e2.target.index == 2
+@test e2.index == 1
 
 
 add_node!(b1,a1)

@@ -23,6 +23,9 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, ExEdge{BayesianNode}}
                     n[i].index = i
                 end
             end
+            for i = 1:length(e)
+                e[i].index = i
+            end
             new(n,e)
         else
             new(n,e)
