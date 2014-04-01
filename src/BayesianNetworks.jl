@@ -9,6 +9,7 @@ module BayesianNetworks
 using Graphs
 
 include("ProbabilityDistribution.jl")
+include("CPT.jl")
 include("types.jl")
 
 ##############################################################################
