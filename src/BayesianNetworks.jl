@@ -1,5 +1,11 @@
 module BayesianNetworks
 
-# package code goes here
+##############################################################################
+##
+## Dependencies
+##
+##############################################################################
 
-end # module
+using Graphs
+
+include("types.jl")
