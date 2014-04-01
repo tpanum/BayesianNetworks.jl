@@ -1,4 +1,4 @@
-function Base.show(io::IO, pd::Probability)
+function Base.show(io::IO, pd::ProbabilityDistribution)
     pds = join(pd.ps, ", ")
     print(io, "probabilities {$pds}")
 end

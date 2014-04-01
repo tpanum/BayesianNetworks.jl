@@ -1,26 +1,5 @@
 #using Graphs
-
-type ProbabilityDistribution{T <: FloatingPoint, K}
-    ps::Array{T,1}
-    states::Array{K,1}
-
-    function ProbabilityDistribution(_ps::Array{T,1}, _ss::Array{K,1})
-        if sum(_ps) != 1
-            throw("Probability Distributions must sum to 1")
-        end
-        new(_ps, _ss)
-    end
-end
-
-ProbabilityDistribution{T,K}(ps::Array{T,1}, ss::Array{K,1}) = ProbabilityDistribution{T,K}(ps, ss)
-
-function states(pd::ProbabilityDistribution)
-    pd.states
-end
-
-type CPT
-    PDs::Array{ProbabilityDistribution,1}
-end
+include("ProbabilityDistribution.jl")
 
 type BayesianNode
 	index::Int
@@ -31,9 +10,11 @@ type BayesianNode
     BayesianNode(i::Int, s::Int, ie::Array{ExEdge{BayesianNode},1}, c::ProbabilityDistribution) = new(i,s,ie, c)    
 end
 
-type BayesianNetwork
+type BayesianNetwork <: AbstractGraph{BayesianNode, ExEdge{BayesianNode}}
     nodes::Array{BayesianNode,1}
     edges::Array{ExEdge{BayesianNode},1}
+
+    BayesianNetwork(n::Array{BayesianNode,1}, e::Array{ExEdge{BayesianNode},1}) = new(n,e)  
 end
 
 function BayesianEdge(i::Int, s::BayesianNode, t::BayesianNode)
