@@ -1,5 +1,6 @@
+using Graphs
 using BayesianNetworks
-using Base.Test  
+using Base.Test
 
 include("probability_distribution.jl")
 include("cpt.jl")
