@@ -4,7 +4,7 @@ function Base.show(io::IO, pd::ProbabilityDistribution)
 end
 
 function Base.show(io::IO, v::BayesianNode)
-    print(io, "vertex [$(v.index)] ($(v.CPT), ingoing $(showEdgeList(v.ingoingEdges)))")
+    print(io, "vertex [$(v.index)] $(v.CPT)")
 end
 
 function showEdgeList(edges::Array{ExEdge{BayesianNode},1})
