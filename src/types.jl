@@ -23,9 +23,11 @@ type BayesianNode
     BayesianNode(i::Int, s::Int, ie::Array{ExEdge{BayesianNode},1}, c::ProbabilityDistribution) = new(i,s,ie, c)    
 end
 
-type BayesianNetwork
+type BayesianNetwork <: AbstractGraph{BayesianNode, ExEdge{BayesianNode}}
     nodes::Array{BayesianNode,1}
     edges::Array{ExEdge{BayesianNode},1}
+
+    BayesianNetwork(n::Array{BayesianNode,1}, e::Array{ExEdge{BayesianNode},1}) = new(n,e)  
 end
 
 function BayesianEdge(i::Int, s::BayesianNode, t::BayesianNode)
