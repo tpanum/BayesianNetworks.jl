@@ -4,39 +4,32 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, ExEdge{BayesianNode}}
 
     function BayesianNetwork(_nodes::Array{BayesianNode,1}, _edges::Array{ExEdge{BayesianNode},1})
         if length(_nodes) > 0
-
+            map(x -> assign_index(x[2],x[1]), enumerate(_nodes))
         end
+        if length(_edges) > 0
+            map(x -> assign_index(x[2],x[1]), enumerate(_edges))
+        end
+        new(_nodes,_edges)
     end
-    ## function BayesianNetwork(n::Array{BayesianNode,1}, e::Array{ExEdge{BayesianNode},1}; set_ids = true)
-    ##     if set_ids == true
-    ##         for i = 1:length(n)
-    ##             if i != n[i].index
-    ##                 nindex = n[i].index
-    ##                 for j = 1:length(e)
-    ##                     if e[j].target == nindex
-    ##                         e.target = i
-    ##                     end
-    ##                 end
-    ##                 n[i].index = i
-    ##             end
-    ##         end
-    ##         for i = 1:length(e)
-    ##             e[i].index = i
-    ##         end
-    ##     end
-    ##     new(n,e)
-    ## end
 end
 
-BayesianNetwork(n::Array{BayesianNode,1}, e::Array{ExEdge{BayesianNode},1}; set_ids = true) = BayesianNetwork(n,e)
+BayesianNetwork(n::Array{None,1}, e::Array{None,1}) = BayesianNetwork(Array(BayesianNode,0),Array(ExEdge{BayesianNode},0))
+BayesianNetwork(n::Array{BayesianNode,1}) = BayesianNetwork(n,Array(ExEdge{BayesianNode},0))
+BayesianNetwork(n::Array{BayesianNode,1}, e::Array{None,1}) = BayesianNetwork(n,Array(ExEdge{BayesianNode},0))
 BayesianNetwork() = BayesianNetwork([], [])
 
 num_edges(g::BayesianNetwork) = length(g.edges)
 edges(g::BayesianNetwork) = g.edges
 
+function assign_index(g_elem, i::Int)
+    if g_elem.index != 0
+        throw("Attempting to reassign node")
+    end
+    g_elem.index=i
+end
+
 function add_node!(g::BayesianNetwork, n::BayesianNode)
-    @assert node_index(n) == 0
-    n.index = num_nodes(g) + 1
+    assign_index(n, num_nodes(g) + 1)
     push!(g.nodes, n)
 end
 
