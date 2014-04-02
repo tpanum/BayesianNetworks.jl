@@ -1,3 +1,1 @@
-function BayesianEdge(i::Int, s::BayesianNode, t::BayesianNode)
-	ExEdge(i,s,t)
-end
+BayesianEdge(s::BayesianNode, t::BayesianNode) = ExEdge(0,s,t)
