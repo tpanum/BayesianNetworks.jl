@@ -24,10 +24,11 @@ export ProbabilityDistribution,
        states,
        probabilities,
        CPT,
-       BayesianNode,,
-       CBayesianNode
+       BayesianNode,
+       CBayesianNode,
        BayesianNetwork,
        BayesianEdge,
+       Node,
        add_node!,
        add_edge!,
        node_index,
@@ -37,6 +38,8 @@ export ProbabilityDistribution,
        edges,
        in_neighbors,
        out_neighbors,
-       find_node
+       find_node,
+       node_array,
+       edge_array
 
 end

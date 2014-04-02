@@ -1,22 +1,16 @@
-type BayesianNode{V}
+abstract Node
+
+type BayesianNode <: Node
     index::Int
     label::ASCIIString
-    state::V
-    states::Array{V,1}
-    CPT::CPT
+    CPT::ProbabilityDistribution
        
-    function BayesianNode(i::Int, l::ASCIIString, s::V, ss::Array{V,1}, c::CPT) 
-        if s in ss
-            new(i,l,s,ss,c)
-        else 
-            throw("Set state is not in the set of allowed states for the node")
-        end
+    function BayesianNode(i::Int, l::ASCIIString, c::ProbabilityDistribution) 
+        new(i,l,c)
     end    
 end
 
-BayesianNode{V}(i::Int, l::ASCIIString, s::V, ss::Array{V,1}, c::CPT) = BayesianNode{V}(i,l,s,ss,c) 
-
-type CBayesianNode
+type CBayesianNode <: Node
     label::ASCIIString
     pdf::Function
 
@@ -27,11 +21,19 @@ function probability(n::CBayesianNode, x)
     n.pdf(x)
 end
 
-type BayesianNetwork{V} <: AbstractGraph{BayesianNode{V}, ExEdge{BayesianNode{V}}}
-    nodes::Array{BayesianNode{V},1}
-    edges::Array{ExEdge{BayesianNode{V}},1}
+type BayesianEdge
+    index::Int
+    source::Node
+    target::Node
 
-    function BayesianNetwork(n::Array{BayesianNode{V},1}, e::Array{ExEdge{BayesianNode{V}},1}; set_ids = true)
+    BayesianEdge(i::Int, s::Node, t::Node) = new(i,s,t)
+end
+
+type BayesianNetwork <: AbstractGraph{Node, BayesianEdge}
+    nodes::Array{Node,1}
+    edges::Array{BayesianEdge,1}
+
+    function BayesianNetwork(n::Array{Node,1}, e::Array{BayesianEdge,1}; set_ids = true)
         if set_ids == true
             for i = 1:length(n)
                 if i != n[i].index
@@ -54,31 +56,26 @@ type BayesianNetwork{V} <: AbstractGraph{BayesianNode{V}, ExEdge{BayesianNode{V}
     end
 end
 
-BayesianNetwork{V}(n::Array{BayesianNode{V},1}, e::Array{ExEdge{BayesianNode{V}},1}; set_ids = true) = BayesianNetwork{V}(n,e)
 
-function BayesianEdge(i::Int, s::BayesianNode, t::BayesianNode)
-	e = ExEdge(i,s,t)
-	e
-end
 
-function add_node!(g::BayesianNetwork, n::BayesianNode)
+#BayesianNetwork(n::Array{Node,1}, e::Array{ExEdge{Node},1}; set_ids = true) = BayesianNetwork(n,e)
+
+function add_node!(g::BayesianNetwork, n::Node)
     @assert node_index(n) == num_nodes(g) + 1
     push!(g.nodes, n)
 end
 
-function add_edge!(g::BayesianNetwork, s::BayesianNode, t::BayesianNode)
-    e = ExEdge(num_edges(g) + 1, s, t)
-    index = node_index(t)
+function add_edge!(g::BayesianNetwork, s::Node, t::Node)
+    e = BayesianEdge(num_edges(g) + 1, s, t)
     push!(g.edges, e)
 end
 
-function add_edge!(g::BayesianNetwork, e::ExEdge{BayesianNode})
+function add_edge!(g::BayesianNetwork, e::BayesianEdge)
     @assert edge_index(e) == num_edges(g) + 1
-    index = node_index(e.target)
     push!(g.edges, e)
 end
 
-function in_neighbors(n::BayesianNode, g::BayesianNetwork)
+function in_neighbors(n::Node, g::BayesianNetwork)
     res = Array(BayesianNode,0)
     for edge in g.edges
         if edge.target.index == n.index
@@ -88,7 +85,7 @@ function in_neighbors(n::BayesianNode, g::BayesianNetwork)
     res
 end
 
-function out_neighbors(n::BayesianNode, g::BayesianNetwork)
+function out_neighbors(n::Node, g::BayesianNetwork)
     res = Array(BayesianNode,0)
     for edge in g.edges
         if edge.source.index == n.index
@@ -107,8 +104,19 @@ function find_node(g::BayesianNetwork, s::ASCIIString)
     NaN
 end
 
+function node_array{V <: Node}(a::Array{V,1})
+    res = Array(Node, length(a))
+    for i = 1:length(a)
+        res[i] = a[i]
+    end
+    res
+end
+
+
+
 
 node_index(n::BayesianNode) = n.index
+edge_index(e::BayesianEdge) = e.index
 
 num_nodes(g::BayesianNetwork) = length(g.nodes)
 nodes(g::BayesianNetwork) = g.nodes
