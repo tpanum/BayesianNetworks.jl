@@ -7,7 +7,7 @@ function Base.show(io::IO, v::BayesianNode)
     print(io, "vertex [$(v.index)] $(v.CPT)")
 end
 
-function showEdgeList(edges::Array{ExEdge{BayesianNode},1})
+function showEdgeList(edges::Array{BayesianEdge,1})
     if length(edges) == 0
         names = "none"
     else
@@ -16,7 +16,7 @@ function showEdgeList(edges::Array{ExEdge{BayesianNode},1})
     names
 end
 
-function showNodeList(nodes::Array{BayesianNode,1})
+function showNodeList(nodes::Array{Node,1})
     if length(nodes) == 0
         names = "none"
     else

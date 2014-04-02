@@ -28,8 +28,9 @@ add_node!(b1,a1)
 add_node!(b1,a2)
 add_node!(b1,a7)
 add_edge!(b1,a1,a2)
+add_edge!(b1,a1,a7)
 
-@test num_edges(b1) == 1
+@test num_edges(b1) == 2
 @test num_nodes(b1) == 3
 @test length(in_neighbors(a2, b1)) == 1
 @test a3.index == 2

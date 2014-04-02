@@ -68,16 +68,20 @@ end
 
 function add_edge!(g::BayesianNetwork, s::Node, t::Node)
     e = BayesianEdge(num_edges(g) + 1, s, t)
-    push!(g.edges, e)
+    if s.index <= num_nodes(g) && t.index <= num_nodes(g)
+        push!(g.edges, e)
+    else
+        throw("Nodes not in graph")
+    end
 end
 
 function add_edge!(g::BayesianNetwork, e::BayesianEdge)
     @assert edge_index(e) == num_edges(g) + 1
-    push!(g.edges, e)
+    add_edge!(g, e.source,e.target)
 end
 
 function in_neighbors(n::Node, g::BayesianNetwork)
-    res = Array(BayesianNode,0)
+    res = Array(Node,0)
     for edge in g.edges
         if edge.target.index == n.index
             push!(res,edge.source)
@@ -87,7 +91,7 @@ function in_neighbors(n::Node, g::BayesianNetwork)
 end
 
 function out_neighbors(n::Node, g::BayesianNetwork)
-    res = Array(BayesianNode,0)
+    res = Array(Node,0)
     for edge in g.edges
         if edge.source.index == n.index
             push!(res,edge.target)
