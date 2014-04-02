@@ -4,7 +4,7 @@ function Base.show(io::IO, pd::ProbabilityDistribution)
         if i != 1
             pds *= ", "
         end
-        pds *= "$(pd.ps[i]): $(pd.states[i])"
+        pds *= "$(pd.states[i]): $(pd.ps[i])"
     end
     print(io, "probabilities {$pds}")
 end
