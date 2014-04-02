@@ -87,6 +87,14 @@ function out_neighbors(n::BayesianNode, g::BayesianNetwork)
     res
 end
 
+function find_node(g::BayesianNetwork, s::ASCIIString)
+    for node in g.nodes
+        if node.label == s
+            return node
+        end
+    end
+    NaN
+end
 
 
 node_index(n::BayesianNode) = n.index

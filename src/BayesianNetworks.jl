@@ -34,6 +34,7 @@ export ProbabilityDistribution,
        num_edges,
        edges,
        in_neighbors,
-       out_neighbors
+       out_neighbors,
+       find_node
 
 end
