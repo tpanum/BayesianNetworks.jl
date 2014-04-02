@@ -18,10 +18,9 @@ BayesianNode{V}(i::Int, l::ASCIIString, s::V, ss::Array{V,1}, c::CPT) = Bayesian
 
 type CBayesianNode
     label::ASCIIString
-    dist::Distribution
     pdf::Function
 
-    CBayesianNode(l::ASCIIString, d::Distribution) = new(i,l,d, x->pdf(d,x))
+    CBayesianNode(l::ASCIIString, d::Distribution) = new(l,x->pdf(d,x))
 end 
 
 function probability(n::CBayesianNode, x)
