@@ -1,10 +1,16 @@
 function Base.show(io::IO, pd::ProbabilityDistribution)
-    pds = join(pd.ps, ", ")
+    pds = ""
+    for i=1:length(pd.ps)
+        if i != 1
+            pds *= ", "
+        end
+        pds *= "$(pd.ps[i]): $(pd.states[i])"
+    end
     print(io, "probabilities {$pds}")
 end
 
 function Base.show(io::IO, v::BayesianNode)
-    print(io, "vertex [$(v.index)] $(v.CPT)")
+    print(io, "vertex [$(v.index)] $(v.pb)")
 end
 
 function showEdgeList(edges::Array{ExEdge{BayesianNode},1})
