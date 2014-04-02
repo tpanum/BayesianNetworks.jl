@@ -14,7 +14,19 @@ type BayesianNode{V}
     end    
 end
 
-BayesianNode{V}(i::Int, l::ASCIIString, s::V, ss::Array{V,1}, c::CPT) = BayesianNode{V}(i,l,s,ss,c)  
+BayesianNode{V}(i::Int, l::ASCIIString, s::V, ss::Array{V,1}, c::CPT) = BayesianNode{V}(i,l,s,ss,c) 
+
+type CBayesianNode
+    label::ASCIIString
+    dist::Distribution
+    pdf::Function
+
+    CBayesianNode(l::ASCIIString, d::Distribution) = new(i,l,d, x->pdf(d,x))
+end 
+
+function probability(n::CBayesianNode, x)
+    n.pdf(x)
+end
 
 type BayesianNetwork{V} <: AbstractGraph{BayesianNode{V}, ExEdge{BayesianNode{V}}}
     nodes::Array{BayesianNode{V},1}
