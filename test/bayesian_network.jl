@@ -12,3 +12,10 @@ add_node!(n1, a2)
 @test a1.index == 1
 @test a2.index == 2
 @test length(n1.nodes) == 2
+
+b1 = BayesianNode(:hulu, pd1)
+b2 = BayesianNode(:bulu, pd1)
+
+n2 = BayesianNetwork([b1,b2],[])
+
+@test b1.index == 1
