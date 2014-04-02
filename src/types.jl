@@ -11,10 +11,11 @@ type BayesianNode <: Node
 end
 
 type CBayesianNode <: Node
+    index::Int
     label::ASCIIString
     pdf::Function
 
-    CBayesianNode(l::ASCIIString, d::Distribution) = new(l,x->pdf(d,x))
+    CBayesianNode(i::Int, l::ASCIIString, d::Distribution) = new(i, l,x->pdf(d,x))
 end 
 
 function probability(n::CBayesianNode, x)
@@ -116,6 +117,7 @@ end
 
 
 node_index(n::BayesianNode) = n.index
+node_index(n::CBayesianNode) = n.index
 edge_index(e::BayesianEdge) = e.index
 
 num_nodes(g::BayesianNetwork) = length(g.nodes)
