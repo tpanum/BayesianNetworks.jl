@@ -10,7 +10,9 @@ using Graphs
 
 include("ProbabilityDistribution.jl")
 include("CPT.jl")
-include("types.jl")
+include("BayesianNode.jl")
+include("BayesianEdge.jl")
+include("BayesianNetwork.jl")
 include("show.jl")
 
 ##############################################################################
