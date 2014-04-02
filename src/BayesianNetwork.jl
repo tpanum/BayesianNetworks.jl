@@ -7,7 +7,7 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, ExEdge{BayesianNode}}
             map(x -> assign_index(x[2],x[1]), enumerate(_nodes))
         end
         if length(_edges) > 0
-            map(y,x -> assign_index(x[2],x[1]), enumerate(_edges))
+            map(x -> assign_index(x[2],x[1]), enumerate(_edges))
         end
         new(_nodes,_edges)
     end
@@ -29,8 +29,7 @@ function assign_index(g_elem, i::Int)
 end
 
 function add_node!(g::BayesianNetwork, n::BayesianNode)
-    @assert node_index(n) == 0
-    n.index = num_nodes(g) + 1
+    assign_index(n, num_nodes(g) + 1)
     push!(g.nodes, n)
 end
 
