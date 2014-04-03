@@ -15,8 +15,8 @@ e2 = BayesianEdge(2,a5,a6)
 @test a4.index == 2
 @test e1.target.index == 2
 
-c = BayesianNetwork(node_array([a4,a3, a7]), [e1])
-d = BayesianNetwork(node_array([a5,a6, a7]), [e2])
+c = BayesianNetwork([a4,a3, a7], [e1])
+d = BayesianNetwork([a5,a6, a7], [e2])
 
 @test a5.index == 1
 @test a6.index == 2
