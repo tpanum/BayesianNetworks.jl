@@ -9,11 +9,11 @@ module BayesianNetworks
 using Graphs
 using Distributions
 
-include("ProbabilityDistribution.jl")
-include("CPT.jl")
-include("BayesianNode.jl")
-include("BayesianEdge.jl")
-include("BayesianNetwork.jl")
+include("probability_distribution.jl")
+include("cpt.jl")
+include("bayesian_node.jl")
+include("bayesian_edge.jl")
+include("bayesian_network.jl")
 include("show.jl")
 
 ##############################################################################
