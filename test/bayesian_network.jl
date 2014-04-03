@@ -64,3 +64,4 @@ add_node!(n3, c3)
 @test node_index(b1) == 1
 
 @test_throws add_edge!(n3,b1,b2)
+@test_throws add_edge!(n3,c3,c1)
