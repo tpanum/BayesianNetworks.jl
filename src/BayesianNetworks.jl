@@ -8,6 +8,7 @@ module BayesianNetworks
 
 using Graphs
 
+include("utils.jl")
 include("probability_distribution.jl")
 include("cpt.jl")
 include("bayesian_node.jl")
@@ -21,7 +22,13 @@ include("show.jl")
 ##
 ##############################################################################
 
-export ProbabilityDistribution,
+export
+
+       # Utils
+       normalize_factor,
+       normpdf,
+
+       ProbabilityDistribution,
        states,
        probabilities,
        CPT,

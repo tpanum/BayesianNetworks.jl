@@ -37,3 +37,10 @@ end
 function ==(pd1::ProbabilityDistribution, pd2::ProbabilityDistribution)
     length(setdiff(Set(states(pd1)),Set(states(pd2)))) == 0
 end
+
+function lpd{K}(states::K)
+    m = length(states)
+    pb = Array(Float64, m)
+    fill!(pb, 1/m)
+    ProbabilityDistribution(pb, states)
+end
