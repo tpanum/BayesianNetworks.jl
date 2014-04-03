@@ -40,7 +40,7 @@ pd3 = ProbabilityDistribution([0.25,0.75], ["head","tails"])
 pd4 = ProbabilityDistribution([0.75,0.25], ["head","tails"])
 b1 = DBayesianNode(:bjarke, pd3)
 b2 = DBayesianNode(:hesthaven, pd4)
-b3 = CBayesianNode(:esben, Normal(0,1))
+b3 = CBayesianNode(:esben, x->x^0.5)
 
 n2 = BayesianNetwork([b1,b2,b3],[])
 
@@ -59,3 +59,8 @@ n3 = BayesianNetwork([c1,c2],[])
 add_node!(n3, c3)
 
 @test length(nodes(n3)) == 3
+
+@test_throws add_node!(n3,b1)
+@test node_index(b1) == 1
+
+@test_throws add_edge!(n3,b1,b2)

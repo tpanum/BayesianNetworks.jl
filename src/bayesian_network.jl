@@ -59,7 +59,7 @@ function add_edge!(g::BayesianNetwork, e::BayesianEdge)
     u = source(e)
     v = target(e)
 
-    if !nodes_in_network(g, u, v)
+    if !nodes_in_network(g, [u, v])
         throw("Attempting to add an edge to a network where the nodes are not present")
     end
     ui = node_index(u)::Int
@@ -73,8 +73,17 @@ function add_edge!(g::BayesianNetwork, e::BayesianEdge)
     e
 end
 
+function nodes_in_network{V <: BayesianNode}(g::BayesianNetwork, ns::Array{V,1})
+    for node in ns
+        if !node_in_network(g,node)
+            return false
+        end
+    end
+    true
+end
+
 function node_in_network(g::BayesianNetwork, n::BayesianNode)
-    
+    nodes(g)[node_index(n)] == n
 end
 
 function find_node(g::BayesianNetwork, s::Symbol)

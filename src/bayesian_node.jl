@@ -3,9 +3,9 @@ abstract BayesianNode
 type DBayesianNode <: BayesianNode
     index::Int
     label::Symbol
-    pb::ProbabilityDistribution
+    pd::ProbabilityDistribution
 
-    DBayesianNode(_label::Symbol, _pb::ProbabilityDistribution) = new(0, _label, _pb)
+    DBayesianNode(_label::Symbol, _pd::ProbabilityDistribution) = new(0, _label, _pd)
 end
 
 function ==(n1::DBayesianNode, n2::DBayesianNode)
@@ -31,6 +31,10 @@ function verify_real_to_real(f::Function)
     catch
         false
     end
+end
+
+function ==(n1::CBayesianNode, n2::CBayesianNode)
+    n1.index == n2.index && n1.label == n2.label && n1.pdf(1) == n2.pdf(1)
 end
 
 function probability(n::CBayesianNode, x)
