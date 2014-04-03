@@ -59,7 +59,7 @@ end
 
 
 
-#BayesianNetwork(n::Array{Node,1}, e::Array{ExEdge{Node},1}; set_ids = true) = BayesianNetwork(n,e)
+BayesianNetwork{V <: Node}(n::Array{V,1}, e::Array{BayesianEdge,1}; set_ids = true) = BayesianNetwork(convert(Array{Node,1},n),e)
 
 function add_node!(g::BayesianNetwork, n::Node)
     @assert node_index(n) == num_nodes(g) + 1
@@ -108,17 +108,6 @@ function find_node(g::BayesianNetwork, s::ASCIIString)
     end
     NaN
 end
-
-function node_array{V <: Node}(a::Array{V,1})
-    res = Array(Node, length(a))
-    for i = 1:length(a)
-        res[i] = a[i]
-    end
-    res
-end
-
-
-
 
 node_index(n::BayesianNode) = n.index
 node_index(n::CBayesianNode) = n.index
