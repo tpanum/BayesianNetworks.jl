@@ -122,3 +122,40 @@ getindex(a::SourceIterator, i::Integer) = source(a.lst[i], a.g)
 start(a::SourceIterator) = start(a.lst)
 done(a::SourceIterator, s) = done(a.lst, s)
 next(a::SourceIterator, s::Int) = ((e, s) = next(a.lst, s); (source(e, a.g), s))
+
+#################################################
+#
+#  CPDs
+#
+################################################
+
+type CPD
+    distribution::Array{BayesianNode,1}
+    conditionals::Array{BayesianNode,1}
+
+    CPD(bn::BayesianNode, conds::Array) = new([bn],conds)
+    CPD(dists::Array, bn::BayesianNode) = new(dists,[bn])
+    CPD(bn1::BayesianNode, bn2::BayesianNode) = new([bn1],[bn2])
+end
+
+function Base.show(io::IO, cpd::CPD)
+    dist=map(bn -> string(bn.label), cpd.distribution)
+    j_dist=join(dist, ",")
+
+    if length(cpd.conditionals) > 0
+        cond=map(bn -> string(bn.label), cpd.conditionals)
+        j_cond=join(cond, ",")
+        print(io,"CPD{P($(j_dist)|$(j_cond))}")
+    else
+        print(io, "CPD{P($(j_dist))}")
+    end
+end
+    
+function cpds(bn::BayesianNetwork)
+    N = nodes(bn)
+    res = Array(CPD, length(N))
+    for i=1:length(N)
+        res[i]=CPD(N[i], map(source, in_neighbors(N[i], bn).lst))
+    end
+    res
+end

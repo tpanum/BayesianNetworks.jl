@@ -36,6 +36,8 @@ export ProbabilityDistribution,
        num_edges,
        edges,
        in_neighbors,
-       out_neighbors
+       out_neighbors,
+       CPD,
+       cpds
 
 end
