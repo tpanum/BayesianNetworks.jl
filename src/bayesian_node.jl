@@ -5,9 +5,7 @@ type DBayesianNode <: BayesianNode
     label::Symbol
     pd::ProbabilityDistribution
 
-    function DBayesianNode(_label::Symbol, _pd::ProbabilityDistribution)
-        new(0, _label, _pd)
-    end
+    DBayesianNode(_label::Symbol, _pd::ProbabilityDistribution) = new(0, _label, _pd)
 end
 
 function ==(n1::DBayesianNode, n2::DBayesianNode)
@@ -19,7 +17,20 @@ type CBayesianNode <: BayesianNode
     label::Symbol
     pdf::Function
 
-    CBayesianNode(l::Symbol, d::Distribution) = new(0, l,x->pdf(d,x))
+    function CBayesianNode(_label::Symbol, _f::Function)
+        if !verify_real_to_real(_f)
+            throw("Probability Density Function must be of type (input) Real -> (output) Real")
+        end
+        new(0, _label, _f)
+    end
+end
+
+function verify_real_to_real(f::Function)
+    try
+        typeof(f(0)) <: Real
+    catch
+        false
+    end
 end
 
 function ==(n1::CBayesianNode, n2::CBayesianNode)
