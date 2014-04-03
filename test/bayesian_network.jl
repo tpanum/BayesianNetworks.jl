@@ -52,6 +52,8 @@ c1 = DBayesianNode(:thomas, pd5)
 c2 = DBayesianNode(:panum, pd6)
 c3 = CBayesianNode(:moller, x->x^0.5)
 
+@test_approx_eq_eps probability(c3,5) 2.236 0.0001
+
 @test_throws CBayesianNode(:moller, x-> "I'm not entirely sure what I'm doing")
 
 n3 = BayesianNetwork([c1,c2],[])
