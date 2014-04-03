@@ -1,13 +1,13 @@
-b1 = BayesianNetwork(Array(Node,0), Array(BayesianEdge,0))
-a1 = BayesianNode(1,"name", ProbabilityDistribution([0.5,0.5],[1,2]))
-a2 = BayesianNode(2,"name", ProbabilityDistribution([0.5,0.5],[1,2]))
+b1 = BayesianNetwork()
+a1 = DBayesianNode(1,"name", ProbabilityDistribution([0.5,0.5],[1,2]))
+a2 = DBayesianNode(2,"name", ProbabilityDistribution([0.5,0.5],[1,2]))
 
-a3 = BayesianNode(1,"name", ProbabilityDistribution([0.5,0.5],[1,2]))
-a4 = BayesianNode(2,"name", ProbabilityDistribution([0.5,0.5],[1,2]))
+a3 = DBayesianNode(1,"name", ProbabilityDistribution([0.5,0.5],[1,2]))
+a4 = DBayesianNode(2,"name", ProbabilityDistribution([0.5,0.5],[1,2]))
 e1 = BayesianEdge(1,a3,a4)
 
-a5 = BayesianNode(1,"name", ProbabilityDistribution([0.5,0.5],[1,2]))
-a6 = BayesianNode(2,"name", ProbabilityDistribution([0.5,0.5],[1,2]))
+a5 = DBayesianNode(1,"name", ProbabilityDistribution([0.5,0.5],[1,2]))
+a6 = DBayesianNode(2,"name", ProbabilityDistribution([0.5,0.5],[1,2]))
 a7 = CBayesianNode(3, "name", Normal(0,1))
 e2 = BayesianEdge(2,a5,a6)
 
