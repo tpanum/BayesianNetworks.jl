@@ -38,7 +38,7 @@ function assign_index(g_elem, i::Int)
     g_elem.index=i
 end
 
-function add_node!(g::BayesianNetwork, n::BayesianNode)
+function add_node!{T <: BayesianNode}(g::BayesianNetwork, n::T)
     assign_index(n, num_nodes(g) + 1)
 
     push!(g.nodes, n)
@@ -50,10 +50,9 @@ function add_node!(g::BayesianNetwork, n::BayesianNode)
     n
 end
 
-add_edge!(g::BayesianNetwork, s::BayesianNode, t::BayesianNode) = add_edge!(g, BayesianEdge(s,t))
+add_edge!{S <: BayesianNode, T <: BayesianNode}(g::BayesianNetwork, s::S, t::T) = add_edge!(g, BayesianEdge(s,t))
 
 function add_edge!(g::BayesianNetwork, e::BayesianEdge)
-    @assert edge_index(e) == 0
     assign_index(e, num_edges(g) + 1)
 
     u = source(e)
@@ -82,7 +81,7 @@ function nodes_in_network{V <: BayesianNode}(g::BayesianNetwork, ns::Array{V,1})
     true
 end
 
-function node_in_network(g::BayesianNetwork, n::BayesianNode)
+function node_in_network{V <: BayesianNode}(g::BayesianNetwork, n::V)
     nodes(g)[node_index(n)] == n
 end
 
@@ -95,13 +94,13 @@ function find_node(g::BayesianNetwork, s::Symbol)
     NaN
 end
 
-in_edges(n::BayesianNode, g::BayesianNetwork) = g.binclist[node_index(n)]
-in_degree(n::BayesianNode, g::BayesianNetwork) = length(in_edges(n, g))
-in_neighbors(n::BayesianNode, g::BayesianNetwork) = SourceIterator(g, in_edges(n, g))
+in_edges{V <: BayesianNode}(n::V, g::BayesianNetwork) = g.binclist[node_index(n)]
+in_degree{V <: BayesianNode}(n::V, g::BayesianNetwork) = length(in_edges(n, g))
+in_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = SourceIterator(g, in_edges(n, g))
 
-out_edges(n::BayesianNode, g::BayesianNetwork) = g.finclist[node_index(n)]
-out_degree(n::BayesianNode, g::BayesianNetwork) = length(out_edges(n, g))
-out_neighbors(n::BayesianNode, g::BayesianNetwork) = TargetIterator(g, out_edges(n, g))
+out_edges{V <: BayesianNode}(n::V, g::BayesianNetwork) = g.finclist[node_index(n)]
+out_degree{V <: BayesianNode}(n::V, g::BayesianNetwork) = length(out_edges(n, g))
+out_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = TargetIterator(g, out_edges(n, g))
 
 edge_index(e::BayesianEdge) = e.index
 
