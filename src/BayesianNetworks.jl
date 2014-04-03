@@ -7,7 +7,6 @@ module BayesianNetworks
 ##############################################################################
 
 using Graphs
-using Distributions
 
 include("probability_distribution.jl")
 include("cpt.jl")

@@ -50,11 +50,12 @@ pd5 = ProbabilityDistribution([0.46,0.54], ["head","tails"])
 pd6 = ProbabilityDistribution([0.99,0.01], ["head","tails"])
 c1 = DBayesianNode(:thomas, pd5)
 c2 = DBayesianNode(:panum, pd6)
-c3 = CBayesianNode(:moller, Normal(0,1))
+c3 = CBayesianNode(:moller, x->x^0.5)
+
+@test_throws CBayesianNode(:moller, x-> "I'm not entirely sure what I'm doing")
 
 n3 = BayesianNetwork([c1,c2],[])
 
 add_node!(n3, c3)
 
 @test length(nodes(n3)) == 3
-@test_approx_eq pdf(Normal(0,1),1) c3.pdf(1)
