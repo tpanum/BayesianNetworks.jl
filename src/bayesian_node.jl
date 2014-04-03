@@ -22,6 +22,10 @@ type CBayesianNode <: BayesianNode
     CBayesianNode(l::Symbol, d::Distribution) = new(0, l,x->pdf(d,x))
 end
 
+function ==(n1::CBayesianNode, n2::CBayesianNode)
+    n1.index == n2.index && n1.label == n2.label && n1.pdf(1) == n2.pdf(1)
+end
+
 function probability(n::CBayesianNode, x)
     n.pdf(x)
 end
