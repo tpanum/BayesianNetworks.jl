@@ -2,8 +2,8 @@ n1 = BayesianNetwork([], [])
 n1 = BayesianNetwork()
 pd1 = ProbabilityDistribution([0.5,0.5], ["head","tails"])
 pd2 = ProbabilityDistribution([0.3,0.7], ["head","tails"])
-a1 = BayesianNode(:hulu, pd1)
-a2 = BayesianNode(:bulu, pd2)
+a1 = DBayesianNode(:hulu, pd1)
+a2 = DBayesianNode(:bulu, pd2)
 
 @test a1.label == :hulu
 
@@ -38,14 +38,23 @@ e1 = add_edge!(n1, a1, a2)
 
 pd3 = ProbabilityDistribution([0.25,0.75], ["head","tails"])
 pd4 = ProbabilityDistribution([0.75,0.25], ["head","tails"])
-b1 = BayesianNode(:bjarke, pd3)
-b2 = BayesianNode(:hesthaven, pd4)
+b1 = DBayesianNode(:bjarke, pd3)
+b2 = DBayesianNode(:hesthaven, pd4)
+b3 = CBayesianNode(:esben, Normal(0,1))
 
-n2 = BayesianNetwork([b1,b2],[])
+n2 = BayesianNetwork([b1,b2,b3],[])
 
 @test b1.index == 1
 
 pd5 = ProbabilityDistribution([0.46,0.54], ["head","tails"])
 pd6 = ProbabilityDistribution([0.99,0.01], ["head","tails"])
-c1 = BayesianNode(:thomas, pd5)
-c2 = BayesianNode(:panum, pd6)
+c1 = DBayesianNode(:thomas, pd5)
+c2 = DBayesianNode(:panum, pd6)
+c3 = CBayesianNode(:moller, Normal(0,1))
+
+n3 = BayesianNetwork([c1,c2],[])
+
+add_node!(n3, c3)
+
+@test length(nodes(n3)) == 3
+@test_approx_eq pdf(Normal(0,1),1) c3.pdf(1)

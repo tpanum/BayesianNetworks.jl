@@ -114,11 +114,11 @@ TargetIterator{G<:AbstractGraph,EList}(g::G, lst::EList) =
 
 length(a::TargetIterator) = length(a.lst)
 isempty(a::TargetIterator) = isempty(a.lst)
-getindex(a::TargetIterator, i::Integer) = target(a.lst[i], a.g)
+getindex(a::TargetIterator, i::Integer) = target(a.lst[i])
 
 start(a::TargetIterator) = start(a.lst)
 done(a::TargetIterator, s) = done(a.lst, s)
-next(a::TargetIterator, s::Int) = ((e, s) = next(a.lst, s); (target(e, a.g), s))
+next(a::TargetIterator, s::Int) = ((e, s) = next(a.lst, s); (target(e), s))
 
 # iterating over sources
 
@@ -132,11 +132,11 @@ SourceIterator{G<:AbstractGraph,EList}(g::G, lst::EList) =
 
 length(a::SourceIterator) = length(a.lst)
 isempty(a::SourceIterator) = isempty(a.lst)
-getindex(a::SourceIterator, i::Integer) = source(a.lst[i], a.g)
+getindex(a::SourceIterator, i::Integer) = source(a.lst[i])
 
 start(a::SourceIterator) = start(a.lst)
 done(a::SourceIterator, s) = done(a.lst, s)
-next(a::SourceIterator, s::Int) = ((e, s) = next(a.lst, s); (source(e, a.g), s))
+next(a::SourceIterator, s::Int) = ((e, s) = next(a.lst, s); (source(e), s))
 
 #################################################
 #

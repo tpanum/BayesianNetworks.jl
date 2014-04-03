@@ -1,3 +1,5 @@
+import Graphs: edge_index, source, target
+
 type BayesianEdge
 	index::Int
 	source::BayesianNode
@@ -7,3 +9,6 @@ type BayesianEdge
 end
 
 edge_index(e::BayesianEdge) = e.index
+
+source(e::BayesianEdge) = e.source
+target(e::BayesianEdge) = e.target

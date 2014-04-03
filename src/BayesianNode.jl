@@ -5,7 +5,7 @@ type DBayesianNode <: BayesianNode
     label::Symbol
     pb::ProbabilityDistribution
 
-    function BayesianNode(_label::Symbol, _pb::ProbabilityDistribution)
+    function DBayesianNode(_label::Symbol, _pb::ProbabilityDistribution)
         new(0, _label, _pb)
     end
 end
@@ -15,7 +15,7 @@ type CBayesianNode <: BayesianNode
     label::Symbol
     pdf::Function
 
-    CBayesianNode(l::ASCIIString, d::Distribution) = new(0, l,x->pdf(d,x))
+    CBayesianNode(l::Symbol, d::Distribution) = new(0, l,x->pdf(d,x))
 end
 
 function probability(n::CBayesianNode, x)
