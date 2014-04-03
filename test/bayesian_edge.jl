@@ -7,6 +7,7 @@ e2 = BayesianEdge(a1,b3)
 
 @test edge_index(e1) == 0
 @test edge_index(e2) == 0
-@test source(e1).index == a1.index
-@test target(e2).index == a2.index
+@test source(e1) == a1
+@test target(e1) == a2
+@test target(e2) == b3
 @test_throws e2 = BayesianEdge(b3,a1)
