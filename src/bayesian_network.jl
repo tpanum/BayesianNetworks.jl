@@ -92,7 +92,7 @@ function find_node(g::BayesianNetwork, s::Symbol)
             return node
         end
     end
-    NaN
+    null
 end
 
 in_edges(n::BayesianNode, g::BayesianNetwork) = g.binclist[node_index(n)]
