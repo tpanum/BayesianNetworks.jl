@@ -26,6 +26,7 @@ export
 
        # Utils
        normalize_factor,
+       normpdf,
 
        ProbabilityDistribution,
        states,
