@@ -58,3 +58,8 @@ add_node!(n3, c3)
 
 @test length(nodes(n3)) == 3
 @test_approx_eq pdf(Normal(0,1),1) c3.pdf(1)
+
+@test_throws add_node!(n3,b1)
+@test node_index(b1) == 1
+
+@test_throws add_edge!(n3,b1,b2)
