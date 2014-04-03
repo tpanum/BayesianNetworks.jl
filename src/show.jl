@@ -19,22 +19,17 @@ function show(io::IO, vc::CBayesianNode)
     print(io, "cnode [$(v.index), $(v.label)]")
 end
 
-function showEdgeList(edges::Array{BayesianEdge,1})
-    if length(edges) == 0
-        names = "none"
-    else
-        names = string("[", join(map(x -> x.index, edges), ", "), "]")
-    end
-    names
-end
+function show(io::IO, cpd::CPD)
+    dist=map(bn -> string(bn.label), cpd.distribution)
+    j_dist=join(dist, ",")
 
-function showNodeList(nodes::Array{BayesianNode,1})
-    if length(nodes) == 0
-        names = "none"
+    if length(cpd.conditionals) > 0
+        cond=map(bn -> string(bn.label), cpd.conditionals)
+        j_cond=join(cond, ",")
+        print(io,"CPD{P($(j_dist)|$(j_cond))}")
     else
-        names = string("[", join(map(x -> x.index, nodes), ", "), "]")
+        print(io, "CPD{P($(j_dist))}")
     end
-    names
 end
 
 function show(io::IO, bn::BayesianNetwork)
@@ -56,4 +51,22 @@ function show(io::IO, cpt::CPT)
         probs = join(cpt.Ps[i,:], ", ")
         print(io, " [$(orderedkeys[i])] {$(probs)}")
     end
+end
+
+function showNodeList(nodes::Array{BayesianNode,1})
+    if length(nodes) == 0
+        names = "none"
+    else
+        names = string("[", join(map(x -> x.index, nodes), ", "), "]")
+    end
+    names
+end
+
+function showEdgeList(edges::Array{BayesianEdge,1})
+    if length(edges) == 0
+        names = "none"
+    else
+        names = string("[", join(map(x -> x.index, edges), ", "), "]")
+    end
+    names
 end
