@@ -63,5 +63,10 @@ add_node!(n3, c3)
 @test_throws add_node!(n3,b1)
 @test node_index(b1) == 1
 
+###################################
+#Tests that should cause errors
+###################################
 @test_throws add_edge!(n3,b1,b2)
 @test_throws add_edge!(n3,c3,c1)
+@test_throws q1 = DBayesianNode("hej", pd3)
+@test_throws q1 = CBayesianNode("Hej", x -> 1)
