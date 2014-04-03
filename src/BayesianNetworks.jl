@@ -7,6 +7,7 @@ module BayesianNetworks
 ##############################################################################
 
 using Graphs
+using Distributions
 
 include("ProbabilityDistribution.jl")
 include("CPT.jl")
@@ -25,9 +26,11 @@ export ProbabilityDistribution,
        states,
        probabilities,
        CPT,
-       BayesianNode,
+       DBayesianNode,
+       CBayesianNode,
        BayesianNetwork,
        BayesianEdge,
+       BayesianNode,
        add_node!,
        add_edge!,
        node_index,
@@ -38,6 +41,7 @@ export ProbabilityDistribution,
        in_neighbors,
        out_neighbors,
        CPD,
-       cpds
+       cpds,
+       find_node
 
 end

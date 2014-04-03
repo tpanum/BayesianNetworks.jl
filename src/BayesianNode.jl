@@ -1,4 +1,6 @@
-type BayesianNode
+abstract BayesianNode
+
+type DBayesianNode <: BayesianNode
     index::Int
     label::Symbol
     pb::ProbabilityDistribution
@@ -8,4 +10,17 @@ type BayesianNode
     end
 end
 
-node_index(n::BayesianNode) = n.index
+type CBayesianNode <: BayesianNode
+    index::Int
+    label::Symbol
+    pdf::Function
+
+    CBayesianNode(l::ASCIIString, d::Distribution) = new(0, l,x->pdf(d,x))
+end
+
+function probability(n::CBayesianNode, x)
+    n.pdf(x)
+end
+
+node_index(n::DBayesianNode) = n.index
+node_index(n::CBayesianNode) = n.index

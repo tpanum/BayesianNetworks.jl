@@ -1,4 +1,6 @@
-function Base.show(io::IO, pd::ProbabilityDistribution)
+import Base: show
+
+function show(io::IO, pd::ProbabilityDistribution)
     pds = ""
     for i=1:length(pd.ps)
         if i != 1
@@ -9,11 +11,15 @@ function Base.show(io::IO, pd::ProbabilityDistribution)
     print(io, "probabilities {$pds}")
 end
 
-function Base.show(io::IO, v::BayesianNode)
-    print(io, "vertex [$(v.index), $(v.label)] $(v.pb)")
+function show(io::IO, vd::DBayesianNode)
+    print(io, "dnode [$(v.index), $(v.label)] $(v.pb)")
 end
 
-function showEdgeList(edges::Array{ExEdge{BayesianNode},1})
+function show(io::IO, vc::CBayesianNode)
+    print(io, "cnode [$(v.index), $(v.label)]")
+end
+
+function showEdgeList(edges::Array{BayesianEdge,1})
     if length(edges) == 0
         names = "none"
     else
@@ -31,13 +37,13 @@ function showNodeList(nodes::Array{BayesianNode,1})
     names
 end
 
-function Base.show(io::IO, bn::BayesianNetwork)
+function show(io::IO, bn::BayesianNetwork)
     edges = showEdgeList(bn.edges)
     nodes = showNodeList(bn.nodes)
     print(io, "edges $edges, nodes $nodes")
 end
 
-function Base.show(io::IO, cpt::CPT)
+function show(io::IO, cpt::CPT)
     indencies=sortperm(collect(values(cpt.keys)))
     orderedkeys=collect(keys(cpt.keys))[indencies]
     states = "none"
