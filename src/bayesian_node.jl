@@ -41,5 +41,4 @@ function probability(n::CBayesianNode, x)
     n.pdf(x)
 end
 
-node_index(n::DBayesianNode) = n.index
-node_index(n::CBayesianNode) = n.index
+node_index{V <: BayesianNode}(n::V) = n.index

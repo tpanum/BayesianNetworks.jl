@@ -57,6 +57,12 @@ c3 = CBayesianNode(:moller, x->x^0.5)
 n3 = BayesianNetwork([c1,c2],[])
 
 add_node!(n3, c3)
+@test_throws add_edge!(n3,c3,c2)
+
+e1 = add_edge!(n3,c2,c3)
+@test typeof(e1) == BayesianEdge
+@test length(edges(n3)) == 1
+@test source(e1) == c2
 
 @test length(nodes(n3)) == 3
 
