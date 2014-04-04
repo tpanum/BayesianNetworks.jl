@@ -18,7 +18,10 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
             map(x -> assign_index(x[2],x[1]), enumerate(_nodes))
             for _n in _nodes
                 if has_pd(_n)
-                    _cpds[CPD(_n.label)] = _n.pd
+                    ####################################
+                    ##Add input when decided what it should be
+                    ###################################
+                    _cpds[CPD(_n.label)] = null
                 end
             end
         end
