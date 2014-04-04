@@ -38,8 +38,14 @@ BayesianNetwork{V <: BayesianNode}(n::Array{V,1}) = BayesianNetwork(n,Array(Baye
 BayesianNetwork{V <: BayesianNode}(n::Array{V,1}, e::Array{None,1}) = BayesianNetwork(n,Array(BayesianEdge,0))
 BayesianNetwork() = BayesianNetwork([], [])
 
-num_edges(g::BayesianNetwork) = length(g.edges)
+nodes(g::BayesianNetwork) = g.nodes
+num_nodes(g::BayesianNetwork) = length(nodes(g))
+
 edges(g::BayesianNetwork) = g.edges
+num_edges(g::BayesianNetwork) = length(edges(g))
+
+cpds(g::BayesianNetwork) = g.cpds
+num_cpds(g::BayesianNetwork) = length(cpds(g))
 
 function assign_index(g_elem, i::Int)
     if g_elem.index != 0
@@ -150,14 +156,6 @@ end
 
 out_degree{V <: BayesianNode}(n::V, g::BayesianNetwork) = length(out_edges(n, g))
 out_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = TargetIterator(g, out_edges(n, g))
-
-edge_index(e::BayesianEdge) = e.index
-
-num_nodes(g::BayesianNetwork) = length(g.nodes)
-nodes(g::BayesianNetwork) = g.nodes
-
-num_edges(g::BayesianNetwork) = length(g.edges)
-edges(g::BayesianNetwork) = g.edges
 
 multivecs{T}(::Type{T}, n::Int) = [T[] for _ =1:n]
 
