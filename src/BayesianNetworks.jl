@@ -30,6 +30,20 @@ export
        normpdf,
        group_combinations,
 
+       # Bayesian Network
+       BayesianNetwork,
+       add_node!,
+       add_edge!,
+       nodes,
+       num_nodes,
+       edges,
+       num_edges,
+       cpds,
+       num_cpds,
+       find_node,
+       node_in_network,
+       nodes_in_network,
+
        ProbabilityDistribution,
        states,
        probabilities,
@@ -39,17 +53,7 @@ export
        CBayesianNode,
        probability,
        BayesianEdge,
-       BayesianNetwork,
-       add_node!,
-       add_edge!,
        node_index,
-       num_nodes,
-       nodes,
-       num_edges,
-       edges,
-       CPD,
-       cpds,
-       find_node,
-       queryBN
+       CPD
 
 end

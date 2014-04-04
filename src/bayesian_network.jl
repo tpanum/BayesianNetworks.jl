@@ -1,4 +1,5 @@
 import Graphs: in_edges, in_degree, in_neighbors, out_edges, out_degree, out_neighbors
+import Base: isempty
 
 type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
     nodes::Array{BayesianNode,1}
@@ -7,17 +8,18 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
     finclist::Array{Array{BayesianEdge,1},1}   #forward incidence list
     binclist::Array{Array{BayesianEdge,1},1}   #backward incidence list
 
-    cpds::Array{CPD,1}
+    cpds::Dict ## Add types if needed
 
     function BayesianNetwork{V <: BayesianNode}(_nodes::Array{V,1}, _edges::Array{BayesianEdge,1})
         _nodes = convert(Array{BayesianNode,1}, _nodes)
         l_nodes = length(_nodes)
-        _cpds=Array(CPD,0)
+        _cpds=Dict()
         if l_nodes > 0
             map(x -> assign_index(x[2],x[1]), enumerate(_nodes))
             for _n in _nodes
-                has_pd(_n)
-                push!(_cpds,CPD(_n.label))
+                if has_pd(_n)
+                    _cpds[CPD(_n.label)] = _n.pd
+                end
             end
         end
         if length(_edges) > 0
@@ -28,7 +30,7 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
             add_edge!(b, edge)
         end
         b
-    end  
+    end
 end
 
 BayesianNetwork(n::Array{None,1}, e::Array{None,1}) = BayesianNetwork(Array(BayesianNode,0),Array(BayesianEdge,0))
@@ -36,14 +38,14 @@ BayesianNetwork{V <: BayesianNode}(n::Array{V,1}) = BayesianNetwork(n,Array(Baye
 BayesianNetwork{V <: BayesianNode}(n::Array{V,1}, e::Array{None,1}) = BayesianNetwork(n,Array(BayesianEdge,0))
 BayesianNetwork() = BayesianNetwork([], [])
 
-num_edges(g::BayesianNetwork) = length(g.edges)
-edges(g::BayesianNetwork) = g.edges
+nodes(g::BayesianNetwork) = g.nodes
+num_nodes(g::BayesianNetwork) = length(nodes(g))
 
-function queryBN(g::BayesianNetwork, query::Symbol)
-    if query in g.cpds
-        true
-    end
-end
+edges(g::BayesianNetwork) = g.edges
+num_edges(g::BayesianNetwork) = length(edges(g))
+
+cpds(g::BayesianNetwork) = g.cpds
+num_cpds(g::BayesianNetwork) = length(cpds(g))
 
 function assign_index(g_elem, i::Int)
     if g_elem.index != 0
@@ -53,6 +55,12 @@ function assign_index(g_elem, i::Int)
 end
 
 function add_node!{T <: BayesianNode}(g::BayesianNetwork, n::T)
+    ##Update what is put into the cpds dictionary when decided
+    if typeof(n) == DBayesianNode && has_pd(n)
+        g.cpds[CPD(n.label, [edge.source.label for edge in in_edges(n, g)])] = n.pd
+    else
+        g.cpds[CPD(n.label, [])] = null
+    end
     assign_index(n, num_nodes(g) + 1)
 
     push!(g.nodes, n)
@@ -75,6 +83,9 @@ function add_edge!(g::BayesianNetwork, e::BayesianEdge)
     if !nodes_in_network(g, [u, v])
         throw("Attempting to add an edge to a network where the nodes are not present")
     end
+
+    add_cpd_for_edge!(g,u,v)
+
     ui = node_index(u)::Int
     vi = node_index(v)::Int
 
@@ -84,6 +95,14 @@ function add_edge!(g::BayesianNetwork, e::BayesianEdge)
     push!(g.binclist[vi], e)
 
     e
+end
+
+function add_cpd_for_edge!(g::BayesianNetwork, s::BayesianNode,t::BayesianNode)
+    if typeof(s) == DBayesianNode && has_pd(s) && has_pd(t)
+        g.cpds[CPD(t.label, s.label)] = null
+    else
+        g.cpds[CPD(t.label, s.label)] = null
+    end
 end
 
 function nodes_in_network{V <: BayesianNode}(g::BayesianNetwork, ns::Array{V,1})
@@ -96,7 +115,11 @@ function nodes_in_network{V <: BayesianNode}(g::BayesianNetwork, ns::Array{V,1})
 end
 
 function node_in_network{V <: BayesianNode}(g::BayesianNetwork, n::V)
-    nodes(g)[node_index(n)] == n
+    if node_index(n) > length(nodes(g)) || node_index(n) == 0
+        false
+    else
+        nodes(g)[node_index(n)] == n
+    end
 end
 
 function find_node(g::BayesianNetwork, s::Symbol)
@@ -108,21 +131,27 @@ function find_node(g::BayesianNetwork, s::Symbol)
     null
 end
 
-in_edges{V <: BayesianNode}(n::V, g::BayesianNetwork) = g.binclist[node_index(n)]
+function in_edges{V <: BayesianNode}(n::V, g::BayesianNetwork)
+    if !node_in_network(g, n)
+        Array{BayesianEdge,1}[]
+    else
+        g.binclist[node_index(n)]
+    end
+end
+
 in_degree{V <: BayesianNode}(n::V, g::BayesianNetwork) = length(in_edges(n, g))
 in_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = SourceIterator(g, in_edges(n, g))
 
-out_edges{V <: BayesianNode}(n::V, g::BayesianNetwork) = g.finclist[node_index(n)]
+function out_edges{V <: BayesianNode}(n::V, g::BayesianNetwork)
+    if !node_in_network(g, n)
+        Array{BayesianEdge,1}[]
+    else
+        g.finclist[node_index(n)]
+    end
+end
+
 out_degree{V <: BayesianNode}(n::V, g::BayesianNetwork) = length(out_edges(n, g))
 out_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = TargetIterator(g, out_edges(n, g))
-
-edge_index(e::BayesianEdge) = e.index
-
-num_nodes(g::BayesianNetwork) = length(g.nodes)
-nodes(g::BayesianNetwork) = g.nodes
-
-num_edges(g::BayesianNetwork) = length(g.edges)
-edges(g::BayesianNetwork) = g.edges
 
 multivecs{T}(::Type{T}, n::Int) = [T[] for _ =1:n]
 
