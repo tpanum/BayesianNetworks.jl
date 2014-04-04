@@ -45,6 +45,3 @@ function lpd{K}(states::K)
     ProbabilityDistribution(pb, states)
 end
 
-function is_set(pd::ProbabilityDistribution)
-    !isempty(probabilities(pd))
-end

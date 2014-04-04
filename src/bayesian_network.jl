@@ -40,12 +40,6 @@ BayesianNetwork() = BayesianNetwork([], [])
 num_edges(g::BayesianNetwork) = length(g.edges)
 edges(g::BayesianNetwork) = g.edges
 
-function queryBN(g::BayesianNetwork, cpd::CPD)
-    if query in g.cpds
-        true
-    end
-end
-
 function assign_index(g_elem, i::Int)
     if g_elem.index != 0
         throw("Attempting to reassign node")
@@ -55,7 +49,7 @@ end
 
 function add_node!{T <: BayesianNode}(g::BayesianNetwork, n::T)
     if typeof(n) == DBayesianNode
-        if is_set(n.pd)
+        if has_pd(n)
             push!(g.cpds, CPD(n.label, [edge.source.label for edge in in_edges(n, g)]))
         end
     else
@@ -98,12 +92,10 @@ function add_edge!(g::BayesianNetwork, e::BayesianEdge)
 end
 
 function add_cpd_for_edge!(g::BayesianNetwork, s::BayesianNode,t::BayesianNode)
-    if typeof(s) == DBayesianNode
-        if is_set(s.pd)
-            push!(g.cpds, CPD(t.label, s.label))
-        end
+    if typeof(s) == DBayesianNode && has_pd(s) && has_pd(t)
+        push!(g.cpds, CPD(t.label, s.label))
     else
-        push!(g.cpds, CPD[t.label, s.label])
+        push!(g.cpds, CPD(t.label, s.label))
     end
 end
 
