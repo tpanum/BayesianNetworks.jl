@@ -15,3 +15,4 @@ grc=group_combinations(groups)
 
 @test Set({"a","c"}) in grc
 @test length(unique(grc)) == prod(map(length,groups))
+@test group_combinations(Array[]) == []
