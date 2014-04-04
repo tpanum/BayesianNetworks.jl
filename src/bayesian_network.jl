@@ -21,6 +21,12 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
         end
         b
     end
+
+    function query(probability::Symbol)
+    if edges[1].label == probability
+        true
+    end
+end
 end
 
 BayesianNetwork(n::Array{None,1}, e::Array{None,1}) = BayesianNetwork(Array(BayesianNode,0),Array(BayesianEdge,0))
