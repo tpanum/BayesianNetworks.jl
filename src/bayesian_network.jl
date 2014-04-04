@@ -56,7 +56,7 @@ end
 function add_node!{T <: BayesianNode}(g::BayesianNetwork, n::T)
     if typeof(n) == DBayesianNode
         if is_set(n.pd)
-            #push!(g.cpds, CPD([n.label], [edge.source.label for edge in in_edges(n, g)]))
+            push!(g.cpds, CPD(n.label, [edge.source.label for edge in in_edges(n, g)]))
         end
     else
         push!(g.cpds, CPD(n.label, []))
@@ -83,6 +83,9 @@ function add_edge!(g::BayesianNetwork, e::BayesianEdge)
     if !nodes_in_network(g, [u, v])
         throw("Attempting to add an edge to a network where the nodes are not present")
     end
+
+    add_cpd_for_edge!(g,u,v)
+
     ui = node_index(u)::Int
     vi = node_index(v)::Int
 
@@ -92,6 +95,16 @@ function add_edge!(g::BayesianNetwork, e::BayesianEdge)
     push!(g.binclist[vi], e)
 
     e
+end
+
+function add_cpd_for_edge!(g::BayesianNetwork, s::BayesianNode,t::BayesianNode)
+    if typeof(s) == DBayesianNode
+        if is_set(s.pd)
+            push!(g.cpds, CPD(t.label, s.label))
+        end
+    else
+        push!(g.cpds, CPD[t.label, s.label])
+    end
 end
 
 function nodes_in_network{V <: BayesianNode}(g::BayesianNetwork, ns::Array{V,1})
