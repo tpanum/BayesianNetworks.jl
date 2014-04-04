@@ -57,7 +57,11 @@ end
 function add_node!{T <: BayesianNode}(g::BayesianNetwork, n::T)
     ##Update what is put into the cpds dictionary when decided
     if typeof(n) == DBayesianNode && has_pd(n)
-        g.cpds[CPD(n.label, [edge.source.label for edge in in_edges(n, g)])] = n.pd
+        g.cpds[CPD(n.label, [])] = null
+        ##Check just made in case someone construct a graph in an non-obvious manner, will probably not be run
+        if length(in_edges(n, g)) > 0
+            g.cpds[CPD(n.label, [edge.source.label for edge in in_edges(n, g)])] = null
+        end
     else
         g.cpds[CPD(n.label, [])] = null
     end
