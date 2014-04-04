@@ -10,6 +10,16 @@ a2 = DBayesianNode(:bulu, pd2)
 @test length(n1.binclist) == 0
 @test length(n1.finclist) == 0
 
+ie1 = in_edges(a1, n1)
+@test length(ie1) == 0
+
+@test in_degree(a1, n1) == 0
+
+oe1 = out_edges(a1, n1)
+@test length(oe1) == 0
+
+@test out_degree(a1, n1) == 0
+
 add_node!(n1, a1)
 
 @test length(n1.binclist) == 1

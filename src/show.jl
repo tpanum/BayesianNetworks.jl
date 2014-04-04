@@ -19,6 +19,10 @@ function show(io::IO, vc::CBayesianNode)
     print(io, "cnode [$(vc.index), $(vc.label)]")
 end
 
+function show(io::IO, e::BayesianEdge)
+    print(io, "$(e.source) --> $(e.target)")
+end
+
 function show(io::IO, cpd::CPD)
     dist=map(bn -> string(bn), cpd.distribution)
     j_dist=join(dist, ",")
