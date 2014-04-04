@@ -52,5 +52,4 @@ function Base.in(x,bn::DBayesianNode)
     (x,bn)
 end
 
-node_index(n::DBayesianNode) = n.index
-node_index(n::CBayesianNode) = n.index
+node_index{V <: BayesianNode}(n::V) = n.index

@@ -12,11 +12,11 @@ function show(io::IO, pd::ProbabilityDistribution)
 end
 
 function show(io::IO, vd::DBayesianNode)
-    print(io, "dnode [$(v.index), $(v.label)] $(v.pb)")
+    print(io, "dnode [$(vd.index), $(vd.label)] $(vd.pd)")
 end
 
 function show(io::IO, vc::CBayesianNode)
-    print(io, "cnode [$(v.index), $(v.label)]")
+    print(io, "cnode [$(vc.index), $(vc.label)]")
 end
 
 function show(io::IO, cpd::CPD)
