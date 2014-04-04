@@ -29,7 +29,7 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
             add_edge!(b, edge)
         end
         b
-    end  
+    end
 end
 
 BayesianNetwork(n::Array{None,1}, e::Array{None,1}) = BayesianNetwork(Array(BayesianNode,0),Array(BayesianEdge,0))
@@ -104,7 +104,11 @@ function nodes_in_network{V <: BayesianNode}(g::BayesianNetwork, ns::Array{V,1})
 end
 
 function node_in_network{V <: BayesianNode}(g::BayesianNetwork, n::V)
-    nodes(g)[node_index(n)] == n
+    if node_index(n) > length(nodes(g)) || node_index(n) == 0
+        false
+    else
+        nodes(g)[node_index(n)] == n
+    end
 end
 
 function find_node(g::BayesianNetwork, s::Symbol)
@@ -116,11 +120,25 @@ function find_node(g::BayesianNetwork, s::Symbol)
     null
 end
 
-in_edges{V <: BayesianNode}(n::V, g::BayesianNetwork) = g.binclist[node_index(n)]
+function in_edges{V <: BayesianNode}(n::V, g::BayesianNetwork)
+    if !node_in_network(g, n)
+        Array{BayesianEdge,1}[]
+    else
+        g.binclist[node_index(n)]
+    end
+end
+
 in_degree{V <: BayesianNode}(n::V, g::BayesianNetwork) = length(in_edges(n, g))
 in_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = SourceIterator(g, in_edges(n, g))
 
-out_edges{V <: BayesianNode}(n::V, g::BayesianNetwork) = g.finclist[node_index(n)]
+function out_edges{V <: BayesianNode}(n::V, g::BayesianNetwork)
+    if !node_in_network(g, n)
+        Array{BayesianEdge,1}[]
+    else
+        g.finclist[node_index(n)]
+    end
+end
+
 out_degree{V <: BayesianNode}(n::V, g::BayesianNetwork) = length(out_edges(n, g))
 out_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = TargetIterator(g, out_edges(n, g))
 
