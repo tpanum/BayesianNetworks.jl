@@ -190,3 +190,8 @@ function cpds(bn::BayesianNetwork)
     end
     res
 end
+
+|(bn1::BayesianNode, bn2::BayesianNode) = CPD(bn1,bn2)
+|(bn1::Array{BayesianNode,1}, bn2::Array{BayesianNode,1}) = CPD(bn1,bn2)
+|(bn1::BayesianNode, bn2::Array{BayesianNode,1}) = CPD(bn1,bn2)
+|(bn1::Array{BayesianNode,1}, bn2::BayesianNode) = CPD(bn1,bn2)    

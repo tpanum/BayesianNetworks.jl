@@ -41,5 +41,16 @@ function probability(n::CBayesianNode, x)
     n.pdf(x)
 end
 
+function states(bn::DBayesianNode)
+    bn.pd.states
+end
+
+function Base.in(x,bn::DBayesianNode)
+    if !(x in states(bn))
+        throw("State mismatch, $x is not a part of the state space")
+    end
+    (x,bn)
+end
+
 node_index(n::DBayesianNode) = n.index
 node_index(n::CBayesianNode) = n.index
