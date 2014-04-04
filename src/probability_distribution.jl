@@ -44,3 +44,4 @@ function lpd{K}(states::K)
     fill!(pb, 1/m)
     ProbabilityDistribution(pb, states)
 end
+

@@ -1,4 +1,5 @@
 import Graphs: in_edges, in_degree, in_neighbors, out_edges, out_degree, out_neighbors
+import Base: isempty
 
 type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
     nodes::Array{BayesianNode,1}
@@ -39,12 +40,6 @@ BayesianNetwork() = BayesianNetwork([], [])
 num_edges(g::BayesianNetwork) = length(g.edges)
 edges(g::BayesianNetwork) = g.edges
 
-function queryBN(g::BayesianNetwork, query::Symbol)
-    if query in g.cpds
-        true
-    end
-end
-
 function assign_index(g_elem, i::Int)
     if g_elem.index != 0
         throw("Attempting to reassign node")
@@ -53,6 +48,13 @@ function assign_index(g_elem, i::Int)
 end
 
 function add_node!{T <: BayesianNode}(g::BayesianNetwork, n::T)
+    if typeof(n) == DBayesianNode
+        if has_pd(n)
+            push!(g.cpds, CPD(n.label, [edge.source.label for edge in in_edges(n, g)]))
+        end
+    else
+        push!(g.cpds, CPD(n.label, []))
+    end
     assign_index(n, num_nodes(g) + 1)
 
     push!(g.nodes, n)
@@ -75,6 +77,9 @@ function add_edge!(g::BayesianNetwork, e::BayesianEdge)
     if !nodes_in_network(g, [u, v])
         throw("Attempting to add an edge to a network where the nodes are not present")
     end
+
+    add_cpd_for_edge!(g,u,v)
+
     ui = node_index(u)::Int
     vi = node_index(v)::Int
 
@@ -84,6 +89,14 @@ function add_edge!(g::BayesianNetwork, e::BayesianEdge)
     push!(g.binclist[vi], e)
 
     e
+end
+
+function add_cpd_for_edge!(g::BayesianNetwork, s::BayesianNode,t::BayesianNode)
+    if typeof(s) == DBayesianNode && has_pd(s) && has_pd(t)
+        push!(g.cpds, CPD(t.label, s.label))
+    else
+        push!(g.cpds, CPD(t.label, s.label))
+    end
 end
 
 function nodes_in_network{V <: BayesianNode}(g::BayesianNetwork, ns::Array{V,1})
