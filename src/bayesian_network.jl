@@ -161,7 +161,3 @@ getindex(a::SourceIterator, i::Integer) = source(a.lst[i])
 start(a::SourceIterator) = start(a.lst)
 done(a::SourceIterator, s) = done(a.lst, s)
 next(a::SourceIterator, s::Int) = ((e, s) = next(a.lst, s); (source(e), s))
-
-function cpds(bn::BayesianNetwork)
-    bn.cpds
-end
