@@ -7,3 +7,11 @@
 
 @test typeof(normpdf(0,1)) == Function
 @test_approx_eq_eps normpdf(0,1)(0) 0.399 0.0001
+
+# Group combinations
+
+groups=Array[["a","b"],["c","d"]]
+grc=group_combinations(groups)
+
+@test Set({"a","c"}) in grc
+@test length(unique(grc)) == prod(map(length,groups))

@@ -28,6 +28,7 @@ export
        # Utils
        normalize_factor,
        normpdf,
+       group_combinations,
 
        ProbabilityDistribution,
        states,
