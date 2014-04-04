@@ -8,17 +8,18 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
     finclist::Array{Array{BayesianEdge,1},1}   #forward incidence list
     binclist::Array{Array{BayesianEdge,1},1}   #backward incidence list
 
-    cpds::Array{CPD,1}
+    cpds::Dict ## Add types if needed
 
     function BayesianNetwork{V <: BayesianNode}(_nodes::Array{V,1}, _edges::Array{BayesianEdge,1})
         _nodes = convert(Array{BayesianNode,1}, _nodes)
         l_nodes = length(_nodes)
-        _cpds=Array(CPD,0)
+        _cpds=Dict()
         if l_nodes > 0
             map(x -> assign_index(x[2],x[1]), enumerate(_nodes))
             for _n in _nodes
-                has_pd(_n)
-                push!(_cpds,CPD(_n.label))
+                if has_pd(_n)
+                    _cpds[CPD(_n.label)] = _n.pd
+                end
             end
         end
         if length(_edges) > 0
@@ -48,12 +49,11 @@ function assign_index(g_elem, i::Int)
 end
 
 function add_node!{T <: BayesianNode}(g::BayesianNetwork, n::T)
-    if typeof(n) == DBayesianNode
-        if has_pd(n)
-            push!(g.cpds, CPD(n.label, [edge.source.label for edge in in_edges(n, g)]))
-        end
+    ##Update what is put into the cpds dictionary when decided
+    if typeof(n) == DBayesianNode && has_pd(n)
+        g.cpds[CPD(n.label, [edge.source.label for edge in in_edges(n, g)])] = n.pd
     else
-        push!(g.cpds, CPD(n.label, []))
+        g.cpds[CPD(n.label, [])] = null
     end
     assign_index(n, num_nodes(g) + 1)
 
@@ -93,9 +93,9 @@ end
 
 function add_cpd_for_edge!(g::BayesianNetwork, s::BayesianNode,t::BayesianNode)
     if typeof(s) == DBayesianNode && has_pd(s) && has_pd(t)
-        push!(g.cpds, CPD(t.label, s.label))
+        g.cpds[CPD(t.label, s.label)] = null
     else
-        push!(g.cpds, CPD(t.label, s.label))
+        g.cpds[CPD(t.label, s.label)] = null
     end
 end
 
