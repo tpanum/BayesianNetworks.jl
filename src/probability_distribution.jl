@@ -1,10 +1,10 @@
 import Base.length
 
-type ProbabilityDistribution{T <: FloatingPoint, K}
+type ProbabilityDistribution{T <: FloatingPoint}
     ps::Array{T,1}
-    states::Array{K,1}
+    states::Array{ASCIIString,1}
 
-    function ProbabilityDistribution(_ps::Array{T,1}, _ss::Array{K,1})
+    function ProbabilityDistribution(_ps::Array{T,1}, _ss::Array{ASCIIString,1})
         if sum(_ps) != 1
             throw("Probability Distributions must sum to 1")
         end
@@ -13,7 +13,7 @@ type ProbabilityDistribution{T <: FloatingPoint, K}
     end
 end
 
-ProbabilityDistribution{T,K}(ps::Array{T,1}, ss::Array{K,1}) = ProbabilityDistribution{T,K}(ps, ss)
+ProbabilityDistribution{T}(ps::Array{T,1}, ss::Array{ASCIIString,1}) = ProbabilityDistribution{T}(ps, ss)
 
 function states(pd::ProbabilityDistribution)
     pd.states
@@ -27,7 +27,7 @@ function length(pd::ProbabilityDistribution)
     length(pd.ps)
 end
 
-function getindex{T,K}(pd::ProbabilityDistribution{T,K}, key::K)
+function getindex{T,K}(pd::ProbabilityDistribution{T}, key::K)
     if !(key in pd.states)
         throw("Invalid key")
     end
