@@ -3,19 +3,27 @@ import Graphs: in_edges, in_degree, in_neighbors, out_edges, out_degree, out_nei
 type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
     nodes::Array{BayesianNode,1}
     edges::Array{BayesianEdge,1}
+
     finclist::Array{Array{BayesianEdge,1},1}   #forward incidence list
     binclist::Array{Array{BayesianEdge,1},1}   #backward incidence list
+
+    cpds::Array{CPD,1}
 
     function BayesianNetwork{V <: BayesianNode}(_nodes::Array{V,1}, _edges::Array{BayesianEdge,1})
         _nodes = convert(Array{BayesianNode,1}, _nodes)
         l_nodes = length(_nodes)
+        _cpds=Array(CPD,0)
         if l_nodes > 0
             map(x -> assign_index(x[2],x[1]), enumerate(_nodes))
+            for _n in _nodes
+                has_pd(_n)
+                push!(_cpds,CPD(_n.label))
+            end
         end
         if length(_edges) > 0
             map(x -> assign_index(x[2],x[1]), enumerate(_edges))
         end
-        b = new(_nodes, Array(BayesianEdge,0), multivecs(BayesianEdge, l_nodes), multivecs(BayesianEdge, l_nodes))
+        b = new(_nodes, Array(BayesianEdge,0), multivecs(BayesianEdge, l_nodes), multivecs(BayesianEdge, l_nodes), _cpds)
         for edge in _edges
             add_edge!(b, edge)
         end
@@ -159,32 +167,3 @@ getindex(a::SourceIterator, i::Integer) = source(a.lst[i])
 start(a::SourceIterator) = start(a.lst)
 done(a::SourceIterator, s) = done(a.lst, s)
 next(a::SourceIterator, s::Int) = ((e, s) = next(a.lst, s); (source(e), s))
-
-#################################################
-#
-#  CPDs
-#
-################################################
-
-type CPD
-    distribution::Array{BayesianNode,1}
-    conditionals::Array{BayesianNode,1}
-
-    CPD(bn::BayesianNode, conds::Array) = new([bn],conds)
-    CPD(dists::Array, bn::BayesianNode) = new(dists,[bn])
-    CPD(bn1::BayesianNode, bn2::BayesianNode) = new([bn1],[bn2])
-end
-
-function cpds(bn::BayesianNetwork)
-    N = nodes(bn)
-    res = Array(CPD, length(N))
-    for i=1:length(N)
-        res[i]=CPD(N[i], map(source, in_neighbors(N[i], bn).lst))
-    end
-    res
-end
-
-|(bn1::BayesianNode, bn2::BayesianNode) = CPD(bn1,bn2)
-|(bn1::Array{BayesianNode,1}, bn2::Array{BayesianNode,1}) = CPD(bn1,bn2)
-|(bn1::BayesianNode, bn2::Array{BayesianNode,1}) = CPD(bn1,bn2)
-|(bn1::Array{BayesianNode,1}, bn2::BayesianNode) = CPD(bn1,bn2)    

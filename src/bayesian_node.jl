@@ -52,4 +52,12 @@ function Base.in(x,bn::DBayesianNode)
     (x,bn)
 end
 
+function has_pd(bn::DBayesianNode)
+    bn.pd != nothing
+end
+
+function has_pd(bn::CBayesianNode)
+    false
+end
+
 node_index{V <: BayesianNode}(n::V) = n.index
