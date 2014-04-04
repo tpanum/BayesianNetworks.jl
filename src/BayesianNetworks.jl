@@ -48,6 +48,7 @@ export
        edges,
        CPD,
        cpds,
-       find_node
+       find_node,
+       queryBN
 
 end

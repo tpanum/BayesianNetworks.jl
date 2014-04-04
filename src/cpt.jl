@@ -39,3 +39,5 @@ end
 function getindex(cpt::CPT, key)
     ProbabilityDistribution(cpt.Ps[cpt.keys[key],:][:],states(cpt))
 end
+
+

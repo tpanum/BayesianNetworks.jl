@@ -28,13 +28,7 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
             add_edge!(b, edge)
         end
         b
-    end
-
-    function query(probability::Symbol)
-    if edges[1].label == probability
-        true
-    end
-end
+    end  
 end
 
 BayesianNetwork(n::Array{None,1}, e::Array{None,1}) = BayesianNetwork(Array(BayesianNode,0),Array(BayesianEdge,0))
@@ -44,6 +38,12 @@ BayesianNetwork() = BayesianNetwork([], [])
 
 num_edges(g::BayesianNetwork) = length(g.edges)
 edges(g::BayesianNetwork) = g.edges
+
+function queryBN(g::BayesianNetwork, query::Symbol)
+    if query in g.cpds
+        true
+    end
+end
 
 function assign_index(g_elem, i::Int)
     if g_elem.index != 0

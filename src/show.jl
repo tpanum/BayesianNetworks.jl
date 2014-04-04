@@ -20,11 +20,11 @@ function show(io::IO, vc::CBayesianNode)
 end
 
 function show(io::IO, cpd::CPD)
-    dist=map(bn -> string(bn.label), cpd.distribution)
+    dist=map(bn -> string(bn), cpd.distribution)
     j_dist=join(dist, ",")
 
     if length(cpd.conditionals) > 0
-        cond=map(bn -> string(bn.label), cpd.conditionals)
+        cond=map(bn -> string(bn), cpd.conditionals)
         j_cond=join(cond, ",")
         print(io,"CPD{P($(j_dist)|$(j_cond))}")
     else
