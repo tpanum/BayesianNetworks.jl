@@ -1,4 +1,5 @@
 import Graphs: in_edges, in_degree, in_neighbors, out_edges, out_degree, out_neighbors
+import Base: isempty
 
 type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
     nodes::Array{BayesianNode,1}
@@ -39,7 +40,7 @@ BayesianNetwork() = BayesianNetwork([], [])
 num_edges(g::BayesianNetwork) = length(g.edges)
 edges(g::BayesianNetwork) = g.edges
 
-function queryBN(g::BayesianNetwork, query::Symbol)
+function queryBN(g::BayesianNetwork, cpd::CPD)
     if query in g.cpds
         true
     end
@@ -53,6 +54,13 @@ function assign_index(g_elem, i::Int)
 end
 
 function add_node!{T <: BayesianNode}(g::BayesianNetwork, n::T)
+    if typeof(n) == DBayesianNode
+        if is_set(n.pd)
+            #push!(g.cpds, CPD([n.label], [edge.source.label for edge in in_edges(n, g)]))
+        end
+    else
+        push!(g.cpds, CPD(n.label, []))
+    end
     assign_index(n, num_nodes(g) + 1)
 
     push!(g.nodes, n)
