@@ -10,9 +10,9 @@
 
 # Group combinations
 
-groups=Array[["a","b"],["c","d"]]
+groups=Array[["a","b"],["c","d"],["e","f","g"],["z","q"]]
 grc=group_combinations(groups)
 
-@test Set({"a","c"}) in grc
+@test Set({"a","c","e","z"}) in grc
 @test length(unique(grc)) == prod(map(length,groups))
 @test group_combinations(Array[]) == []
