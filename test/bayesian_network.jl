@@ -46,6 +46,13 @@ e1 = add_edge!(n1, a1, a2)
 @test out_neighbors(a1,n1)[1].label == :bulu
 @test in_degree(a2,n1) != out_degree(a2,n1)
 
+@test symbols_in_network(n1, [:hulu, :bulu]) == true
+@test symbols_in_network(n1, [:hulu, :bjarke]) == false
+
+@test add_probability!(n1, P(:hulu|:bulu), ProbabilityDensityDistribution(states(a1,1), [x -> x+1, x -> x+2])) == true
+@test add_probability!(n1, P(:hulu|:bjarke), ProbabilityDensityDistribution(states(a1,1), [x -> x+1, x -> x+2])) == false
+@test add_probability!(n1, P(:bjarke|:hulu), ProbabilityDensityDistribution(states(a1,1), [x -> x+1, x -> x+2])) == false
+
 pd3 = ProbabilityDistribution([0.25,0.75], ["head","tails"])
 pd4 = ProbabilityDistribution([0.75,0.25], ["head","tails"])
 b1 = DBayesianNode(:bjarke, pd3)

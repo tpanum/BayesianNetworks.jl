@@ -50,6 +50,10 @@ function states(bn::DBayesianNode)
     states(bn.pd)
 end
 
+function states(bn::DBayesianNode, i::Int64)
+    states(bn.pd, i)
+end
+
 function Base.in(x,bn::DBayesianNode)
     if !(x in states(bn))
         throw("State mismatch, $x is not a part of the state space")

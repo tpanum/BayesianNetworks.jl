@@ -10,13 +10,13 @@ using Graphs
 
 include("utils.jl")
 include("probability_distribution.jl")
+include("probability_density_distribution.jl")
 include("cpt.jl")
 include("bayesian_node.jl")
 include("bayesian_edge.jl")
 include("cpd.jl")
 include("bayesian_network.jl")
 include("show.jl")
-include("probability_density_distribution.jl")
 
 ##############################################################################
 ##
@@ -42,9 +42,11 @@ export
        num_edges,
        cpds,
        num_cpds,
-       find_node,
+       find_node_by_symbol,
+       symbols_in_network,
        node_in_network,
        nodes_in_network,
+       add_probability!,
 
        PDistribution,
        UnknownPDistribution,

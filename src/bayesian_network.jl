@@ -13,7 +13,7 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
     function BayesianNetwork{V <: BayesianNode}(_nodes::Array{V,1}, _edges::Array{BayesianEdge,1})
         _nodes = convert(Array{BayesianNode,1}, _nodes)
         l_nodes = length(_nodes)
-        _cpds=Dict()
+        _cpds=Dict{CPD, Any}()
         if l_nodes > 0
             map(x -> assign_index(x[2],x[1]), enumerate(_nodes))
             for _n in _nodes
@@ -128,13 +128,22 @@ function node_in_network{V <: BayesianNode}(g::BayesianNetwork, n::V)
     end
 end
 
-function find_node(g::BayesianNetwork, s::Symbol)
+function symbols_in_network(g::BayesianNetwork, ss::Array{Symbol,1})
+    for s in ss
+        if find_node_by_symbol(g,s) == false
+            return false
+        end
+    end
+    true
+end
+
+function find_node_by_symbol(g::BayesianNetwork, s::Symbol)
     for node in g.nodes
         if node.label == s
             return node
         end
     end
-    null
+    false
 end
 
 function in_edges{V <: BayesianNode}(n::V, g::BayesianNetwork)
@@ -160,7 +169,7 @@ out_degree{V <: BayesianNode}(n::V, g::BayesianNetwork) = length(out_edges(n, g)
 out_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = TargetIterator(g, out_edges(n, g))
 
 function add_probability!(g::BayesianNetwork, cpd::CPD, pdd::ProbabilityDensityDistribution)
-    if nodes_in_network(g, distribution(cpd)) && nodes_in_network(g, conditionals(cpd))
+    if symbols_in_network(g, distribution(cpd)) && symbols_in_network(g, conditionals(cpd))
         g.cpds[cpd] = pdd
         true
     else
