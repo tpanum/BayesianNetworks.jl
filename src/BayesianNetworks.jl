@@ -60,6 +60,7 @@ export
        probability,
        BayesianEdge,
        node_index,
-       CPD
+       CPD,
+       P
 
 end
