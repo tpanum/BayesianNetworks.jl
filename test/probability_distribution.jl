@@ -25,5 +25,5 @@ pd4 = ProbabilityDistribution([0.2, 0.1, 0.2, 0.2, 0.1, 0.2], ["one", "two", "th
 
 pd2_1 = ProbabilityDistribution([0.4 0.1; 0.25 0.25], Array{ASCIIString,1}[["tails","head"],["happy","sad"]])
 
-#@test pd2_1["tails","happy"] == 0.4
+@test_approx_eq pd2_1["tails","happy"] 0.4
 
