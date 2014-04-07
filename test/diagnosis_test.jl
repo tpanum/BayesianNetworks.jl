@@ -26,3 +26,5 @@ for a in analysis
 
     add_probability!(bn, P(a.label|:D), ProbabilityDensityDistribution(states(D), [x -> pdf(a_d1_dist,x), x -> pdf(a_d2_dist,x), a_d_water_pdf]))
 end
+
+bn.query(P(:D|{:a1 => 30, :a2 => 250, a_d_water_pdf => 0}))
