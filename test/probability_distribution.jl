@@ -1,6 +1,9 @@
 pd1 = ProbabilityDistribution([0.5,0.5], ["head","tails"])
 
 @test states(pd1) == (["head","tails"],)
+@test states(pd1,1) == ["head", "tails"]
+@test states(pd1,2) == []
+@test length(states(pd1,2)) == 0
 @test_approx_eq 0.5 pd1["head"]
 
 pd2 = ProbabilityDistribution([0.5,0.5], ["tails","head"])
@@ -26,4 +29,3 @@ pd4 = ProbabilityDistribution([0.2, 0.1, 0.2, 0.2, 0.1, 0.2], ["one", "two", "th
 pd2_1 = ProbabilityDistribution([0.4 0.1; 0.25 0.25], Array{ASCIIString,1}[["tails","head"],["happy","sad"]])
 
 #@test pd2_1["tails","happy"] == 0.4
-
