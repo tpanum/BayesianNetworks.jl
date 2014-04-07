@@ -13,5 +13,6 @@ before_install:
   - sudo apt-get update -qq -y
   - sudo apt-get install libpcre3-dev julia -y
 script:
-  - julia -e 'Pkg.init(); Pkg.clone(pwd()); Pkg.resolve();'
+  - julia -e 'Pkg.init(); run(`ln -s $(pwd()) $(Pkg.dir("BayesianNetworks"))`); Pkg.pin("BayesianNetworks"); Pkg.resolve();'
+  - julia -e 'using BayesianNetworks; @assert isdefined(:BayesianNetworks); @assert typeof(BayesianNetworks) === Module'
   - julia test/runtests.jl
