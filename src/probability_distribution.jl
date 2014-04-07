@@ -27,7 +27,7 @@ type ProbabilityDistribution{T <: Real,K}
 
         order_dim_1=sortperm(_ss[1])
         order_dim_2=sortperm(_ss[2])
-        new(_ps[order_dim_1,order_dim_2], (_ss[1][order_dim_1],_ss[2][order_dim_1]))
+        new(_ps[order_dim_1,order_dim_2], (_ss[1][order_dim_1],_ss[2][order_dim_2]))
     end
 end
 
