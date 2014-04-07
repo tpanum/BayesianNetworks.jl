@@ -29,6 +29,7 @@ export
        normalize_factor,
        normpdf,
        group_combinations,
+       joint_probability_distributions,
 
        # Bayesian Network
        BayesianNetwork,

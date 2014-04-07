@@ -74,3 +74,7 @@ function lpd{K}(states::K)
     fill!(pb, 1/m)
     ProbabilityDistribution(pb, states)
 end
+
+function joint_probability_distributions(p1::ProbabilityDistribution, p2::ProbabilityDistribution)
+    collect([p1.ps[i]*p2.ps[j] for i=1:length(p1.ps), j=1:length(p2.ps)])
+end
