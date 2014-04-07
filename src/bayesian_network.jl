@@ -8,7 +8,7 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
     finclist::Array{Array{BayesianEdge,1},1}   #forward incidence list
     binclist::Array{Array{BayesianEdge,1},1}   #backward incidence list
 
-    cpds::Dict ## Add types if needed
+    cpds::Dict{CPD,Any} ## Add types if needed
 
     function BayesianNetwork{V <: BayesianNode}(_nodes::Array{V,1}, _edges::Array{BayesianEdge,1})
         _nodes = convert(Array{BayesianNode,1}, _nodes)
@@ -158,6 +158,15 @@ end
 
 out_degree{V <: BayesianNode}(n::V, g::BayesianNetwork) = length(out_edges(n, g))
 out_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = TargetIterator(g, out_edges(n, g))
+
+function add_probability!(g::BayesianNetwork, cpd::CPD, pdd::ProbabilityDensityDistribution)
+    if nodes_in_network(g, distribution(cpd)) && nodes_in_network(g, conditionals(cpd))
+        g.cpds[cpd] = pdd
+        true
+    else
+        false
+    end
+end
 
 multivecs{T}(::Type{T}, n::Int) = [T[] for _ =1:n]
 
