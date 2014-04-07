@@ -15,7 +15,9 @@ ProbabilityDensityDistribution{V}(_states::Array{V,1}, _pdfs::Array{Function,1})
 
 function valid_pdfs(pdfs::Array{Function,1})
 	for f in pdfs
-		verify_real_to_real(f)
+		if !verify_real_to_real(f)
+			return false
+		end
 	end
 	true
 end
