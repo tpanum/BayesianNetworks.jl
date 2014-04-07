@@ -8,5 +8,6 @@ include("probability_distribution.jl")
 include("bayesian_node.jl")
 include("bayesian_network.jl")
 include("bayesian_edge.jl")
-include("diagnosis_test.jl")
 include("probability_density_distribution.jl")
+include("diagnosis_test.jl")
+

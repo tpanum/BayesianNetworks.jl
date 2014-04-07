@@ -61,6 +61,8 @@ export
        BayesianEdge,
        node_index,
        CPD,
-       P
+       P,
+       valid_pdfs
+
 
 end
