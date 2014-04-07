@@ -42,7 +42,7 @@ function probability(n::CBayesianNode, x)
 end
 
 function states(bn::DBayesianNode)
-    bn.pd.states
+    states(bn.pd)
 end
 
 function Base.in(x,bn::DBayesianNode)
@@ -61,8 +61,8 @@ function has_pd(bn::CBayesianNode)
 end
 
 function set_state_names(pd::ProbabilityDistribution, name::Symbol)
-    for i=1:length(pd.states)
-        pd.states[i] = string(name,"{",pd.states[i],"}")
+    for i=1:length(states(pd,1))
+        pd.dim_states[1][i] = string(name,"{",states(pd,1)[i],"}")
     end
     pd
 end

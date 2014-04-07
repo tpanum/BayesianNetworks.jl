@@ -4,7 +4,7 @@ using Base.Test
 
 include("utility.jl")
 include("probability_distribution.jl")
-include("cpt.jl")
+#include("cpt.jl")
 include("bayesian_node.jl")
 include("bayesian_network.jl")
 include("bayesian_edge.jl")
