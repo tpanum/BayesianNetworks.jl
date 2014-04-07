@@ -91,8 +91,6 @@ function add_edge!(g::BayesianNetwork, e::BayesianEdge)
         throw("Attempting to add an edge to a network where the nodes are not present")
     end
 
-   
-
     ui = node_index(u)::Int
     vi = node_index(v)::Int
 
