@@ -66,7 +66,7 @@ function add_node!{T <: BayesianNode}(g::BayesianNetwork, n::T)
             g.cpds[CPD(n.label, [edge.source.label for edge in in_edges(n, g)])] = null
         end
     else
-        g.cpds[CPD(n.label, [])] = null
+        g.cpds[CPD(n.label, [   ])] = null
     end
     assign_index(n, num_nodes(g) + 1)
 

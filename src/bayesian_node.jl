@@ -26,6 +26,8 @@ type CBayesianNode <: BayesianNode
         end
         new(0, _label, _f)
     end
+
+    CBayesianNode(_label::Symbol) = new(0,_label,x -> throw("Probability Density Function not defined for node $_label"))
 end
 
 function verify_real_to_real(f::Function)
@@ -68,6 +70,10 @@ function set_state_names(pd::ProbabilityDistribution, name::Symbol)
         pd.dim_states[1][i] = string(name,"{",states(pd,1)[i],"}")
     end
     pd
+end
+
+function add_pdf!(n::CBayesianNode, f::Function)
+    n.pdf = f
 end
 
 node_index{V <: BayesianNode}(n::V) = n.index

@@ -16,3 +16,11 @@ grc=group_combinations(groups)
 @test Set({"a","c","e","z"}) in grc
 @test length(unique(grc)) == prod(map(length,groups))
 @test group_combinations(Array[]) == []
+
+# Joint probability distribution
+
+pd1 = ProbabilityDistribution([0.4 0.1; 0.25 0.25], Array{ASCIIString,1}[["tails","head"],["happy","sad"]])
+pd2 = ProbabilityDistribution([0.4 0.1; 0.25 0.25], Array{ASCIIString,1}[["tails","head"],["happy","sad"]])
+a = joint_probability_distributions(pd1, pd2)
+@test sum(a) == 1
+
