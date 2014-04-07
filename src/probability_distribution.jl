@@ -1,6 +1,25 @@
 import Base.length
 
-type ProbabilityDistribution{T <: Real,K}
+abstract PDistribution
+
+type UnknownPDistribution{K} <: PDistribution
+    states::Array{K,1}
+
+    function UnknownPDistribution(_states::Array{K,1})
+        sort!(_states)
+        new(_states)
+    end
+end
+
+UnknownPDistribution{K}(ss::Array{K,1}) = UnknownPDistribution{K}(ss)
+
+states(pd::UnknownPDistribution) = pd.states
+
+function ==(pd1::UnknownPDistribution, pd2::UnknownPDistribution)
+    length(setdiff(Set(states(pd1)),Set(states(pd2)))) == 0
+end
+
+type ProbabilityDistribution{T <: Real,K} <: PDistribution
     ps::Array{T}
     dim_states::(Array{K,1},Array{K,1})
 

@@ -44,6 +44,8 @@ export
        node_in_network,
        nodes_in_network,
 
+       PDistribution,
+       UnknownPDistribution,
        ProbabilityDistribution,
        states,
        probabilities,

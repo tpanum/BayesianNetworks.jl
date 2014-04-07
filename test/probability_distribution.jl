@@ -6,6 +6,17 @@ pd1 = ProbabilityDistribution([0.5,0.5], ["head","tails"])
 @test length(states(pd1,2)) == 0
 @test_approx_eq 0.5 pd1["head"]
 
+upd1 = UnknownPDistribution(["test", "bøh", "bjarke", "thomas"])
+@test states(upd1) == ["bjarke", "bøh", "test", "thomas"]
+
+upd2 = UnknownPDistribution(["test", "bøh", "bjarke", "thomas"])
+
+@test upd1 == upd2
+
+upd3 = UnknownPDistribution(["test", "bøh", "bjarke", "esben"])
+
+@test upd1 != upd3
+
 pd2 = ProbabilityDistribution([0.5,0.5], ["tails","head"])
 
 @test pd1 == pd2
