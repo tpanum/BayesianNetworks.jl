@@ -8,7 +8,10 @@ type CPD
     CPD(bn1::Symbol, bn2::Symbol) = new([bn1],[bn2])
 end
 
-|(bn1::Symbol, bn2::Symbol) = CPD(bn1,bn2)
-|(bn1::Array{Symbol,1}, bn2::Array{Symbol,1}) = CPD(bn1,bn2)
-|(bn1::Symbol, bn2::Array{Symbol,1}) = CPD(bn1,bn2)
-|(bn1::Array{Symbol,1}, bn2::Symbol) = CPD(bn1,bn2)
+P{T <: (Symbol,Symbol)}(vals::T) = CPD(vals[1],vals[2])
+P(val::Symbol) = CPD(val, Symbol[])
+                        
+|(bn1::Symbol, bn2::Symbol) = (bn1,bn2)
+|(bn1::Array{Symbol,1}, bn2::Array{Symbol,1}) = (bn1,bn2)
+|(bn1::Symbol, bn2::Array{Symbol,1}) = (bn1,bn2)
+|(bn1::Array{Symbol,1}, bn2::Symbol) = (bn1,bn2)

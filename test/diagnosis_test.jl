@@ -10,6 +10,19 @@ add_edge!(bn,D,a1)
 add_edge!(bn,D,a2)
 add_edge!(bn,D,a3)
 
-add_probability!(bn, cpd(:a1|D), ProbabilityDensituDistribution(states(D), [ ... functions ... ]))
-add_probability!(bn, cpd(:a2|D), ProbabilityDensituDistribution(states(D), [ ... functions ... ]))
-add_probability!(bn, cpd(:a3|D), ProbabilityDensituDistribution(states(D), [ ... functions ... ]))
+analysis=[a1,a2,a3]
+
+# Distributions
+
+using Distributions
+
+for a in analysis
+    a_d1_dist = Normal(rand(1:200), rand(1:15))
+    a_d2_dist = Normal(rand(200:400), rand(1:15))
+
+    samples = [ rand(dist) for i=1:100, dist in [a_d1_dist, a_d2_dist] ]
+
+    a_d_water_pdf = x -> 1/(maximum(samples) - minimum(samples))
+
+    add_probability!(bn, P(a.label|:D), ProbabilityDensityDistribution(states(D), [x -> pdf(a_d1_dist,x), x -> pdf(a_d2_dist,x), a_d_water_pdf]))
+end
