@@ -5,6 +5,11 @@ function show(io::IO, pd::ProbabilityDistribution)
     print(io, "ProbabilityDistribution{$(x)x$(y)}")
 end
 
+function show(io::IO, pd::UnknownPDistribution)
+    x = join(states(pd), ", ")
+    print(io, "UnknownPDistribution{$(x)}")
+end
+
 function show(io::IO, vd::DBayesianNode)
     print(io, "dnode [$(vd.index), $(vd.label)] $(vd.pd)")
 end

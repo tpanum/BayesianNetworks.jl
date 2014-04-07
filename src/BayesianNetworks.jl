@@ -16,6 +16,7 @@ include("bayesian_edge.jl")
 include("cpd.jl")
 include("bayesian_network.jl")
 include("show.jl")
+include("probability_density_distribution.jl")
 
 ##############################################################################
 ##
@@ -48,7 +49,9 @@ export
        PDistribution,
        UnknownPDistribution,
        ProbabilityDistribution,
+       ProbabilityDensityDistribution,
        states,
+       pdfs,
        probabilities,
        CPT,
        BayesianNode,
@@ -58,6 +61,8 @@ export
        BayesianEdge,
        node_index,
        CPD,
-       P
+       P,
+       valid_pdfs
+
 
 end
