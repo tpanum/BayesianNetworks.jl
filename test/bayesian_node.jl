@@ -5,8 +5,9 @@
 pd1 = ProbabilityDistribution([0.5,0.5], ["head","tails"])
 pd2 = ProbabilityDistribution([0.3,0.7], ["head","tails"])
 a1 = DBayesianNode(:hulu, pd1)
-	a2 = DBayesianNode(:bulu, pd2)
+a2 = DBayesianNode(:bulu, pd2)
 a3 = DBayesianNode(:hulu, ProbabilityDistribution([0.5,0.5], ["tails", "head"]))
+a4 = DBayesianNode(:diags, ["d1", "d2", "d_water"])
 
 @test a1 == a1
 @test a1 == a3

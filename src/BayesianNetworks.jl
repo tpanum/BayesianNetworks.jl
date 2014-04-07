@@ -29,6 +29,7 @@ export
        normalize_factor,
        normpdf,
        group_combinations,
+       joint_probability_distributions,
 
        # Bayesian Network
        BayesianNetwork,
@@ -44,6 +45,8 @@ export
        node_in_network,
        nodes_in_network,
 
+       PDistribution,
+       UnknownPDistribution,
        ProbabilityDistribution,
        states,
        probabilities,

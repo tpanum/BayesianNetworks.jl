@@ -66,7 +66,7 @@ function add_node!{T <: BayesianNode}(g::BayesianNetwork, n::T)
             g.cpds[CPD(n.label, [edge.source.label for edge in in_edges(n, g)])] = null
         end
     else
-        g.cpds[CPD(n.label, [])] = null
+        g.cpds[CPD(n.label, [   ])] = null
     end
     assign_index(n, num_nodes(g) + 1)
 
@@ -90,8 +90,6 @@ function add_edge!(g::BayesianNetwork, e::BayesianEdge)
     if !nodes_in_network(g, [u, v])
         throw("Attempting to add an edge to a network where the nodes are not present")
     end
-
-   
 
     ui = node_index(u)::Int
     vi = node_index(v)::Int
