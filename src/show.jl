@@ -1,14 +1,8 @@
 import Base: show
 
 function show(io::IO, pd::ProbabilityDistribution)
-    pds = ""
-    for i=1:length(pd.ps)
-        if i != 1
-            pds *= ", "
-        end
-        pds *= "$(pd.states[i]): $(pd.ps[i])"
-    end
-    print(io, "probabilities {$pds}")
+    x,y = map(length,states(pd))
+    print(io, "ProbabilityDistribution{$(x)x$(y)}")
 end
 
 function show(io::IO, vd::DBayesianNode)

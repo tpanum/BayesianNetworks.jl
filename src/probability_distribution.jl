@@ -11,7 +11,7 @@ type ProbabilityDistribution{T <: Real,K}
             true
         end
     end
-    
+
     function ProbabilityDistribution(_ps::Array{T,1}, _ss::Array{K,1})
 
         check_pd_sum!(_ps)
@@ -24,10 +24,10 @@ type ProbabilityDistribution{T <: Real,K}
         if length(_ss) != 2
             throw("Dimension mismatch")
         end
-        
+
         order_dim_1=sortperm(_ss[1])
         order_dim_2=sortperm(_ss[2])
-        new(_ps[order_dim_1,order_dim_2], (_ss[1][order_dim_1],_ss[2][order_dim_1]))
+        new(_ps[order_dim_1,order_dim_2], (_ss[1][order_dim_1],_ss[2][order_dim_2]))
     end
 end
 
@@ -35,7 +35,14 @@ ProbabilityDistribution{T,K}(ps::Array{T,1}, ss::Array{K,1}) = ProbabilityDistri
 ProbabilityDistribution{T,K}(ps::Array{T,2}, ss::Array{Array{K,1},1}) = ProbabilityDistribution{T,K}(ps, ss)
 
 states(pd::ProbabilityDistribution) = pd.dim_states
-states(pd::ProbabilityDistribution,i::Integer) = states(pd)[i]
+
+function states(pd::ProbabilityDistribution,i::Integer)
+    if i > length(states(pd))
+        []
+    else
+        states(pd)[i]
+    end
+end
 
 function probabilities(pd::ProbabilityDistribution)
     pd.ps
@@ -60,7 +67,7 @@ function getindex{T,K}(pd::ProbabilityDistribution{T,K}, key1::K, key2::K)
     if !(key2 in states(pd)[2])
         throw("Invalid key")
     end
-    
+
     pd.ps[key1 .== states(pd)[1], key2 .== states(pd)[2]][1]
 end
 
