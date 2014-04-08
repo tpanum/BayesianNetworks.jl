@@ -35,3 +35,8 @@ function group_combinations(groups::Array{Array,1})
         []
     end
 end
+
+function single_to_multi_index(i::Integer, dims::(Integer,Integer))
+    dim1, dim2 = dims
+    convert(Integer,ceil(i/dim1)), i%dim1 > 0 ? i%dim1 : dim1
+end

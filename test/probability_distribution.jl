@@ -31,3 +31,7 @@ pd4 = ProbabilityDistribution(["one", "two", "three", "four", "five", "six"], [0
 @test_approx_eq 0.2 pd4["one"]
 
 @test_throws pd4 = ProbabilityDistribution(["one", "two", "three", "four", "five", "six"], [0.2, 0.2, 0.2, 0.2, 0.2, 0.2])
+
+pd4 = ProbabilityDistribution(["rain","sun"], [0.5,0.5])
+
+@test length(states(pd1*pd4)) == 4

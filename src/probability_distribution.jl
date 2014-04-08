@@ -82,6 +82,24 @@ function lpd{K}(states::K)
     ProbabilityDistribution(pb, states)
 end
 
-function joint_probability_distributions(p1::PDistribution, p2::PDistribution)
-    collect([p1.ps[i]*p2.ps[j] for i=1:length(p1.ps), j=1:length(p2.ps)])
+function *(p1::ProbabilityDistributionVector, p2::ProbabilityDistributionVector)
+    ps_m=probabilities(p1)'.*probabilities(p2)
+    s_p1=states(p1)
+    s_p2=states(p2)
+
+    combinations=length(s_p1)*length(s_p2)
+    # indexes of values to in the ps_m
+    ## indencies=find(triu(ones(Bool, size(ps_m,1), size(ps_m,2))))
+    
+    common_type=promote_type(eltype(s_p1), eltype(s_p2))
+    j_states=Array(Array{common_type,1}, combinations)
+
+    size_ps_m=size(ps_m)
+    
+    for i=1:combinations
+        p1_s_index, p2_s_index = single_to_multi_index(i, size_ps_m)
+        j_states[i]=common_type[s_p1[p1_s_index], s_p2[p2_s_index]]
+    end
+    
+    ProbabilityDistribution(j_states, reshape(ps_m, combinations))
 end
