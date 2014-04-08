@@ -18,10 +18,7 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
             map(x -> assign_index(x[2],x[1]), enumerate(_nodes))
             for _n in _nodes
                 if has_pd(_n)
-                    ####################################
-                    ##Add input when decided what it should be
-                    ###################################
-                    _cpds[CPD(_n.label)] = null
+                    _cpds[CPD(_n.label)] = _n.pd
                 end
             end
         end
@@ -60,7 +57,7 @@ end
 function add_node!{T <: BayesianNode}(g::BayesianNetwork, n::T)
     ##Update what is put into the cpds dictionary when decided
     if typeof(n) == DBayesianNode && has_pd(n)
-        g.cpds[CPD(n.label, [])] = null
+        g.cpds[CPD(n.label, [])] = n.pd
         ##Check just made in case someone construct a graph in an non-obvious manner, will probably not be run
         if length(in_edges(n, g)) > 0
             g.cpds[CPD(n.label, [edge.source.label for edge in in_edges(n, g)])] = null
@@ -192,28 +189,51 @@ multivecs{T}(::Type{T}, n::Int) = [T[] for _ =1:n]
 ################################################
 
 function legal_configuration(bn::BayesianNetwork, cpd::CPD)
-    for label in cpd.conditionals
-        edgesIn = in_edges(find_node_by_symbol(bn,label), bn)
-        edgesOut = out_edges(find_node_by_symbol(bn,label), bn)
-        if !validate_conf(cpd.distribution,  Set(get_edge_source_labels(edgesIn))) && !validate_conf(cpd.distribution, Set(get_edge_target_labels(edgesOut)))
-            return false
+    nodes = Set(cpd.conditionals)
+    size = 0
+    checkedNodes = Set()
+    uncheckedNodes = Set()
+    for label in cpd.distribution
+        uncheckedNodes = union(Set(gather_nodes_by_edge_out(out_edges(find_node_by_symbol(bn,label), bn))), gather_nodes_by_edge_in(in_edges(find_node_by_symbol(bn,label), bn)))
+    end
+    while 0 < length(uncheckedNodes)
+        for node in uncheckedNodes
+            inNodes = gather_nodes_by_edge_in(in_edges(find_node_by_symbol(bn,node.label), bn))
+            outNodes = gather_nodes_by_edge_out(out_edges(find_node_by_symbol(bn,node.label), bn))
+            union!(uncheckedNodes, setdiff(inNodes,checkedNodes))
+            union!(uncheckedNodes, setdiff(outNodes,checkedNodes))
+            push!(checkedNodes,node)
+            delete!(uncheckedNodes,node)
         end
     end
-    true
-end
 
-function validate_conf(syms::Array{Symbol,1}, edges::Set)
-    for sym in syms
-        if !(sym in edges)
-            return false
+    for node in checkedNodes
+        if node.label in nodes
+            delete!(nodes,node.label)
         end
     end
-    true
+    if isempty(nodes)
+        true
+    else
+        false
+    end
 end
 
-get_edge_source_labels(edges::Array{BayesianEdge,1}) = unique(map(edge -> edge.source.label, edges))
+function gather_nodes_by_edge_in(edges::Array{BayesianEdge,1})
+    e = Set()
+    for edge in edges
+        push!(e,edge.source)
+    end
+    e
+end
 
-get_edge_target_labels(edges::Array{BayesianEdge,1}) = unique(map(edge -> edge.target.label, edges))
+function gather_nodes_by_edge_out(edges::Array{BayesianEdge,1})
+    e = Set()
+    for edge in edges
+        push!(e,edge.target)
+    end
+    e
+end
 
 function check_requirements(g::BayesianNetwork, cpd::CPD)
     conds = conditionals(cpd)
@@ -232,5 +252,13 @@ function get_cpd(g::BayesianNetwork, cpd::CPD)
         getindex(cpds(g),cpd)
     catch
         false
+    end
+end
+
+function cached_result(bn::BayesianNetwork, cpd::CPD)
+    if cpd in collect(keys(bn.cpds))
+        bn.cpds[cpd]
+    else
+        throw("Maybe a bit aggresive to throw an error for the cpd not being in the network, but oh well for now")
     end
 end

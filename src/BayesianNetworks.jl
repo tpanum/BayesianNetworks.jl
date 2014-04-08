@@ -11,7 +11,6 @@ using Graphs
 include("utils.jl")
 include("probability_distribution.jl")
 include("probability_density_distribution.jl")
-include("cpt.jl")
 include("bayesian_node.jl")
 include("bayesian_edge.jl")
 include("cpd.jl")
@@ -49,6 +48,7 @@ export
        add_probability!,
        legal_configuration,
        check_requirements,
+       cached_result,
 
        PDistribution,
        UnknownPDistribution,
@@ -66,7 +66,8 @@ export
        node_index,
        CPD,
        P,
-       valid_pdfs
+       valid_pdfs,
+       isequal
 
 
 end

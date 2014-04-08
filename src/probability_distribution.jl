@@ -2,97 +2,78 @@ import Base.length
 
 abstract PDistribution
 
-type UnknownPDistribution{K} <: PDistribution
-    states::Array{K,1}
+check_pd_sum!{N <: Real}(_ps::Array{N,1}) = sum(_ps) != 1 ? throw("Probability Distributions must sum to 1") : true;
+check_pd_sum!{N <: Real}(_ps::Array{N,2}) = sum(_ps) != size(_ps,1) ? throw("Conditional Probability Distributions must consist of probability distributions which sum to 1") : true;
 
-    function UnknownPDistribution(_states::Array{K,1})
-        sort!(_states)
-        new(_states)
+type ProbabilityDistributionVector{T <: Real, K} <: PDistribution
+    states::Array{K,1}
+    ps::Array{T,1}
+
+    function ProbabilityDistributionVector(_states::Array{K,1}, _ps::Array{T,1})
+        length(_ps) > 0 ? check_pd_sum!(_ps) : nothing;
+        new(_states, _ps)
     end
 end
 
-UnknownPDistribution{K}(ss::Array{K,1}) = UnknownPDistribution{K}(ss)
+type ProbabilityDistributionMatrix{T <: Real, K, Q} <: PDistribution
+    states::Array{K,1}
+    ps::Array{T,2}
+    conditionals::Array{Q,1}
 
-states(pd::UnknownPDistribution) = pd.states
+    function ProbabilityDistributionMatrix(_states::Array{K,1}, _ps::Array{T,2}, _conditionals::Array{Q,1})
+        check_pd_sum!(_ps)
+        new(_states, _ps, _conditionals)
+    end
+end
 
-function ==(pd1::UnknownPDistribution, pd2::UnknownPDistribution)
+states(pd::PDistribution) = pd.states
+conditionals(pd::PDistribution) = pd.conditionals
+
+function ==(pd1::PDistribution, pd2::PDistribution)
     length(setdiff(Set(states(pd1)),Set(states(pd2)))) == 0
 end
 
-type ProbabilityDistribution{T <: Real,K} <: PDistribution
-    ps::Array{T}
-    dim_states::(Array{K,1},Array{K,1})
+ProbabilityDistribution{T,K}(states::Array{K,1}, ps::Array{T,1}) = ProbabilityDistributionVector{T,K}(states, ps)
+ProbabilityDistribution{T,K,Q}(states::Array{K,1}, ps::Array{T,2}, conditionals::Array{Q,1}) = ProbabilityDistributionMatrix{T,K,Q}(states, ps, conditionals)
+ProbabilityDistribution{K}(states::Array{K,1}) = ProbabilityDistribution(states, Real[])
 
-    function check_pd_sum!{N <: Real}(_ps::Array{N})
-        if sum(_ps) != 1
-            throw("Probability Distributions must sum to 1")
-        else
-            true
-        end
-    end
-
-    function ProbabilityDistribution(_ps::Array{T,1}, _ss::Array{K,1})
-
-        check_pd_sum!(_ps)
-        order=sortperm(_ss)
-        new(_ps[order], (_ss[order],))
-    end
-    function ProbabilityDistribution(_ps::Array{T,2}, _ss::Array{Array{K,1},1})
-        check_pd_sum!(_ps)
-
-        if length(_ss) != 2
-            throw("Dimension mismatch")
-        end
-
-        order_dim_1=sortperm(_ss[1])
-        order_dim_2=sortperm(_ss[2])
-        new(_ps[order_dim_1,order_dim_2], (_ss[1][order_dim_1],_ss[2][order_dim_2]))
-    end
-end
-
-ProbabilityDistribution{T,K}(ps::Array{T,1}, ss::Array{K,1}) = ProbabilityDistribution{T,K}(ps, ss)
-ProbabilityDistribution{T,K}(ps::Array{T,2}, ss::Array{Array{K,1},1}) = ProbabilityDistribution{T,K}(ps, ss)
-
-states(pd::ProbabilityDistribution) = pd.dim_states
-
-function states(pd::ProbabilityDistribution,i::Integer)
-    if i > length(states(pd))
-        []
-    else
-        states(pd)[i]
-    end
-end
-
-function probabilities(pd::ProbabilityDistribution)
+function probabilities(pd::PDistribution)
     pd.ps
 end
 
-function length(pd::ProbabilityDistribution)
+function length(pd::PDistribution)
     length(pd.ps)
 end
 
-function getindex{T,K}(pd::ProbabilityDistribution{T,K}, key::K)
-    if !(key in states(pd)[1])
-        throw("Invalid key")
-    end
-    pd.ps[key .== states(pd)[1]]
-end
-
-function getindex{T,K}(pd::ProbabilityDistribution{T,K}, key1::K, key2::K)
-    if !(key1 in states(pd)[1])
+function getindex{K}(pd::PDistribution, key::K)
+    states(pd)::Array{K,1}
+    
+    if !(key in states(pd))
         throw("Invalid key")
     end
 
-    if !(key2 in states(pd)[2])
-        throw("Invalid key")
+    if typeof(pd) <: ProbabilityDistributionVector
+        pd.ps[key .== states(pd)]
+    else
+        # is matrix
+        pd.ps[:,key .== states(pd)]
     end
 
-    pd.ps[key1 .== states(pd)[1], key2 .== states(pd)[2]][1]
 end
 
-function ==(pd1::ProbabilityDistribution, pd2::ProbabilityDistribution)
-    length(setdiff(Set(states(pd1)),Set(states(pd2)))) == 0
-end
+## Later...
+
+## function getindex{T,K}(pd::ProbabilityDistribution{T,K}, key1::K, key2::K)
+##     if !(key1 in states(pd)[1])
+##         throw("Invalid key")
+##     end
+
+##     if !(key2 in states(pd)[2])
+##         throw("Invalid key")
+##     end
+
+##     pd.ps[key1 .== states(pd)[1], key2 .== states(pd)[2]][1]
+## end
 
 function lpd{K}(states::K)
     m = length(states)
@@ -101,6 +82,6 @@ function lpd{K}(states::K)
     ProbabilityDistribution(pb, states)
 end
 
-function joint_probability_distributions(p1::ProbabilityDistribution, p2::ProbabilityDistribution)
+function joint_probability_distributions(p1::PDistribution, p2::PDistribution)
     collect([p1.ps[i]*p2.ps[j] for i=1:length(p1.ps), j=1:length(p2.ps)])
 end

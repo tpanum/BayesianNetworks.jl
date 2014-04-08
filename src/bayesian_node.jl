@@ -9,7 +9,7 @@ type DBayesianNode <: BayesianNode
     DBayesianNode{T <: PDistribution}(_label::Symbol, _pd::T) = new(0, _label, _pd)
 end
 
-DBayesianNode{K}(_label::Symbol, _arr::Array{K,1}) = DBayesianNode(_label, UnknownPDistribution(_arr))
+DBayesianNode{K}(_label::Symbol, _arr::Array{K,1}) = DBayesianNode(_label, ProbabilityDistribution(_arr))
 
 function ==(n1::DBayesianNode, n2::DBayesianNode)
     n1.index == n2.index && n1.label == n2.label && n1.pd == n2.pd
@@ -69,9 +69,9 @@ function has_pd(bn::CBayesianNode)
     false
 end
 
-function set_state_names(pd::ProbabilityDistribution, name::Symbol)
-    for i=1:length(states(pd,1))
-        pd.dim_states[1][i] = string(name,"{",states(pd,1)[i],"}")
+function set_state_names(pd::PDistribution, name::Symbol)
+    for i=1:length(states(pd))
+        pd.states[i] = string(name,"{",states(pd)[i],"}")
     end
     pd
 end

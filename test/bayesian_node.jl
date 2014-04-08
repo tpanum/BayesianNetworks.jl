@@ -1,13 +1,15 @@
-@test_throws DBayesianNode(1, :hulu, ProbabilityDistribution([0.5,0.5], ["head","tails"]))
-@test_throws DBayesianNode("Hej", ProbabilityDistribution([0.5,0.5], ["head","tails"]))
+pd = ProbabilityDistribution(["head","tails"],[0.5,0.5])
+
+@test_throws DBayesianNode(1, :hulu, pd)
+@test_throws DBayesianNode("Hej", pd)
 @test_throws DBayesianNode(:hulu, x -> x^5)
 
-pd1 = ProbabilityDistribution([0.5,0.5], ["head","tails"])
-pd2 = ProbabilityDistribution([0.3,0.7], ["head","tails"])
+pd1 = ProbabilityDistribution(["head","tails"],[0.5,0.5])
+pd2 = ProbabilityDistribution(["head","tails"],[0.7,0.3])
 a1 = DBayesianNode(:hulu, pd1)
 a2 = DBayesianNode(:bulu, pd2)
-a3 = DBayesianNode(:tjaeh, ProbabilityDistribution([0.5,0.5], ["tails", "head"]))
-a3 = DBayesianNode(:hulu, ProbabilityDistribution([0.5,0.5], ["tails", "head"]))
+a3 = DBayesianNode(:tjaeh, pd)
+a3 = DBayesianNode(:hulu, pd)
 a4 = DBayesianNode(:diags, ["d1", "d2", "d_water"])
 
 @test a1 == a1

@@ -1,7 +1,7 @@
 n1 = BayesianNetwork([], [])
 n1 = BayesianNetwork()
-pd1 = ProbabilityDistribution([0.5,0.5], ["head","tails"])
-pd2 = ProbabilityDistribution([0.3,0.7], ["head","tails"])
+pd1 = ProbabilityDistribution(["head","tails"],[0.5,0.5])
+pd2 = ProbabilityDistribution(["head","tails"],[0.3,0.7])
 a1 = DBayesianNode(:hulu, pd1)
 a2 = DBayesianNode(:bulu, pd2)
 
@@ -22,6 +22,7 @@ oe1 = out_edges(a1, n1)
 
 add_node!(n1, a1)
 
+@test cached_result(n1,P(:hulu)) == pd1
 @test length(n1.binclist) == 1
 @test length(n1.finclist) == 1
 
@@ -49,12 +50,12 @@ e1 = add_edge!(n1, a1, a2)
 @test symbols_in_network(n1, [:hulu, :bulu]) == true
 @test symbols_in_network(n1, [:hulu, :bjarke]) == false
 
-@test add_probability!(n1, P(:hulu|:bulu), ProbabilityDensityDistribution(states(a1,1), [x -> x+1, x -> x+2])) == true
-@test add_probability!(n1, P(:hulu|:bjarke), ProbabilityDensityDistribution(states(a1,1), [x -> x+1, x -> x+2])) == false
-@test add_probability!(n1, P(:bjarke|:hulu), ProbabilityDensityDistribution(states(a1,1), [x -> x+1, x -> x+2])) == false
+@test add_probability!(n1, P(:hulu|:bulu), ProbabilityDensityDistribution(states(a1), [x -> x+1, x -> x+2])) == true
+@test add_probability!(n1, P(:hulu|:bjarke), ProbabilityDensityDistribution(states(a1), [x -> x+1, x -> x+2])) == false
+@test add_probability!(n1, P(:bjarke|:hulu), ProbabilityDensityDistribution(states(a1), [x -> x+1, x -> x+2])) == false
 
-pd3 = ProbabilityDistribution([0.25,0.75], ["head","tails"])
-pd4 = ProbabilityDistribution([0.75,0.25], ["head","tails"])
+pd3 = ProbabilityDistribution(["head","tails"],[0.25,0.75])
+pd4 = ProbabilityDistribution(["head","tails"],[0.75,0.25])
 b1 = DBayesianNode(:bjarke, pd3)
 b2 = DBayesianNode(:hesthaven, pd4)
 b3 = CBayesianNode(:esben, x->x^0.5)
@@ -63,8 +64,8 @@ n2 = BayesianNetwork([b1,b2,b3],[])
 
 @test b1.index == 1
 
-pd5 = ProbabilityDistribution([0.46,0.54], ["head","tails"])
-pd6 = ProbabilityDistribution([0.99,0.01], ["head","tails"])
+pd5 = ProbabilityDistribution(["head","tails"],[0.46,0.54])
+pd6 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
 c1 = DBayesianNode(:thomas, pd5)
 c2 = DBayesianNode(:panum, pd6)
 c3 = CBayesianNode(:moller, x->x^0.5)
@@ -98,22 +99,37 @@ e1 = add_edge!(n3,c2,c3)
 
 ###################################
 
-pd7 = ProbabilityDistribution([0.46,0.54], ["head","tails"])
-pd8 = ProbabilityDistribution([0.99,0.01], ["head","tails"])
-pd9 = ProbabilityDistribution([0.99,0.01], ["head","tails"])
-pd10 = ProbabilityDistribution([0.99,0.01], ["head","tails"])
-d1 = DBayesianNode(:esben, pd7)
-d2 = DBayesianNode(:pilgaard, pd8)
-d3 = DBayesianNode(:moller, pd9)
-d4 = DBayesianNode(:retard_node, pd10)
-n4 = BayesianNetwork([d1,d2,d3, d4],[])
+pd7 = ProbabilityDistribution(["head","tails"],[0.46,0.54])
+pd8 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
+pd9 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
+pd10 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
+pd11 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
+pd12 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
+pd13 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
+pd14 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
+d1 = DBayesianNode(:d1, pd7)
+d2 = DBayesianNode(:d2, pd8)
+d3 = DBayesianNode(:d3, pd9)
+d4 = DBayesianNode(:d4, pd10)
+d5 = DBayesianNode(:d5, pd11)
+d6 = DBayesianNode(:d6, pd12)
+d7 = DBayesianNode(:d7, pd13)
+d8 = DBayesianNode(:d8, pd14)
+n4 = BayesianNetwork([d1,d2,d3,d4,d5,d6,d7,d8],[])
 
 add_edge!(n4,d2,d1)
 add_edge!(n4,d3,d1)
-@test legal_configuration(n4, CPD([:esben], [:pilgaard,:moller])) == true
-@test legal_configuration(n4, CPD([:pilgaard,:moller], [:esben])) == true
-@test legal_configuration(n4, CPD([:pilgaard,:moller], [:retard_node])) == false
-@test legal_configuration(n4, CPD([:pilgaard], [:retard_node, :esben])) == false
+add_edge!(n4,d6,d7)
+add_edge!(n4,d7,d2)
+add_edge!(n4,d8,d5)
+add_edge!(n4,d1,d5)
+
+@test legal_configuration(n4, CPD([:d1], [:d2,:d3])) == true
+@test legal_configuration(n4, CPD([:d2,:d3], [:d1])) == true
+@test legal_configuration(n4, CPD([:d1], [:d2,:d3,:d5,:d6,:d7,:d8])) == true
+@test legal_configuration(n4, CPD([:d1], [:d2,:d3,:d8])) == true
+@test legal_configuration(n4, CPD([:d2,:d3], [:d4])) == false
+@test legal_configuration(n4, CPD([:d2], [:d4, :d1])) == false
 
 ####################################
 
