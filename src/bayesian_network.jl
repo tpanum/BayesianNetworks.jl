@@ -155,7 +155,7 @@ function in_edges{V <: BayesianNode}(n::V, g::BayesianNetwork)
 end
 
 in_degree{V <: BayesianNode}(n::V, g::BayesianNetwork) = length(in_edges(n, g))
-in_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = SourceIterator(g, in_edges(n, g))
+in_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = map(e -> e.source, in_edges(n, g))
 
 function out_edges{V <: BayesianNode}(n::V, g::BayesianNetwork)
     if !node_in_network(g, n)
@@ -166,7 +166,7 @@ function out_edges{V <: BayesianNode}(n::V, g::BayesianNetwork)
 end
 
 out_degree{V <: BayesianNode}(n::V, g::BayesianNetwork) = length(out_edges(n, g))
-out_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = TargetIterator(g, out_edges(n, g))
+out_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = map(e -> e.target, out_edges(n, g))
 
 function add_probability!(g::BayesianNetwork, cpd::CPD, pdd::ProbabilityDensityDistribution)
     if symbols_in_network(g, distribution(cpd)) && symbols_in_network(g, conditionals(cpd))
@@ -181,42 +181,51 @@ multivecs{T}(::Type{T}, n::Int) = [T[] for _ =1:n]
 
 #################################################
 #
-#  iteration
+#  query
 #
 ################################################
 
-# iterating over targets
-
-immutable TargetIterator{G<:AbstractGraph,EList}
-    g::G
-    lst::EList
+function legal_configuration(bn::BayesianNetwork, cpd::CPD)
+    for label in cpd.conditionals
+        edgesIn = in_edges(find_node_by_symbol(bn,label), bn)
+        edgesOut = out_edges(find_node_by_symbol(bn,label), bn)
+        if !validate_conf(cpd.distribution,  Set(get_edge_source_labels(edgesIn))) && !validate_conf(cpd.distribution, Set(get_edge_target_labels(edgesOut)))
+            return false
+        end
+    end
+    true
 end
 
-TargetIterator{G<:AbstractGraph,EList}(g::G, lst::EList) =
-    TargetIterator{G,EList}(g, lst)
-
-length(a::TargetIterator) = length(a.lst)
-isempty(a::TargetIterator) = isempty(a.lst)
-getindex(a::TargetIterator, i::Integer) = target(a.lst[i])
-
-start(a::TargetIterator) = start(a.lst)
-done(a::TargetIterator, s) = done(a.lst, s)
-next(a::TargetIterator, s::Int) = ((e, s) = next(a.lst, s); (target(e), s))
-
-# iterating over sources
-
-immutable SourceIterator{G<:AbstractGraph,EList}
-    g::G
-    lst::EList
+function validate_conf(syms::Array{Symbol,1}, edges::Set)
+    for sym in syms
+        if !(sym in edges)
+            return false
+        end
+    end
+    true
 end
 
-SourceIterator{G<:AbstractGraph,EList}(g::G, lst::EList) =
-    SourceIterator{G,EList}(g, lst)
+get_edge_source_labels(edges::Array{BayesianEdge,1}) = unique(map(edge -> edge.source.label, edges))
 
-length(a::SourceIterator) = length(a.lst)
-isempty(a::SourceIterator) = isempty(a.lst)
-getindex(a::SourceIterator, i::Integer) = source(a.lst[i])
+get_edge_target_labels(edges::Array{BayesianEdge,1}) = unique(map(edge -> edge.target.label, edges))
 
-start(a::SourceIterator) = start(a.lst)
-done(a::SourceIterator, s) = done(a.lst, s)
-next(a::SourceIterator, s::Int) = ((e, s) = next(a.lst, s); (source(e), s))
+function check_requirements(g::BayesianNetwork, cpd::CPD)
+    conds = conditionals(cpd)
+    dist = distribution(cpd)
+    to_check = [P(conds|dist), P(conds), P(dist)]
+    the_check
+    for i in to_check
+        if check_requirement(g, i) == false
+            return false
+        end
+    end
+    true
+end
+
+function check_requirement(g::BayesianNetwork, cpd::CPD)
+    try
+        cpds(g)[cpd]
+    catch
+        false
+    end
+end

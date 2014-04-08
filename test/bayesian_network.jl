@@ -89,6 +89,25 @@ e1 = add_edge!(n3,c2,c3)
 @test node_index(b1) == 1
 
 ###################################
+
+pd7 = ProbabilityDistribution([0.46,0.54], ["head","tails"])
+pd8 = ProbabilityDistribution([0.99,0.01], ["head","tails"])
+pd9 = ProbabilityDistribution([0.99,0.01], ["head","tails"])
+pd10 = ProbabilityDistribution([0.99,0.01], ["head","tails"])
+d1 = DBayesianNode(:esben, pd7)
+d2 = DBayesianNode(:pilgaard, pd8)
+d3 = DBayesianNode(:moller, pd9)
+d4 = DBayesianNode(:retard_node, pd10)
+n4 = BayesianNetwork([d1,d2,d3, d4],[])
+
+add_edge!(n4,d2,d1)
+add_edge!(n4,d3,d1)
+@test legal_configuration(n4, CPD([:esben], [:pilgaard,:moller])) == true
+@test legal_configuration(n4, CPD([:pilgaard,:moller], [:esben])) == true
+@test legal_configuration(n4, CPD([:pilgaard,:moller], [:retard_node])) == false
+@test legal_configuration(n4, CPD([:pilgaard], [:retard_node, :esben])) == false
+
+###################################
 #Tests that should cause errors
 ###################################
 @test_throws add_edge!(n3,b1,b2)
