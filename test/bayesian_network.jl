@@ -133,8 +133,8 @@ add_edge!(n4,d1,d5)
 
 ####################################
 
-pdbhs1 = ProbabilityDistribution([0.5,0.5], ["head", "tails"])
-pdbhs2 = ProbabilityDistribution([0.75,0.25], ["head", "tails"])
+pdbhs1 = ProbabilityDistribution(["head", "tails"], [0.5,0.5])
+pdbhs2 = ProbabilityDistribution(["head", "tails"], [0.75,0.25])
 abhs1 = DBayesianNode(:R, pdbhs1)
 abhs2 = DBayesianNode(:S, pdbhs2)
 
@@ -142,5 +142,5 @@ nbhs1 = BayesianNetwork([abhs1, abhs2])
 add_edge!(nbhs1, abhs1, abhs2)
 
 @test check_requirements(nbhs1, P(:S|:R)) == false
-# add_probability!(nbhs1, P(:R|:S), ProbabilityDistribution([0.33, 0.67], ["head", "tails"]))
-# @test check_requirements(nbhs1, P(:S|:R)) == true
+add_probability!(nbhs1, P(:R|:S), ProbabilityDistribution(["head", "tails"], [0.33, 0.67]))
+@test check_requirements(nbhs1, P(:S|:R)) == true
