@@ -193,7 +193,6 @@ function legal_configuration(bn::BayesianNetwork, cpd::CPD)
     for label in cpd.distribution
         uncheckedNodes = union(Set(gather_nodes_by_edge_out(out_edges(find_node_by_symbol(bn,label), bn))), gather_nodes_by_edge_in(in_edges(find_node_by_symbol(bn,label), bn)))
     end
-
     while 0 < length(uncheckedNodes)
         for node in uncheckedNodes
             inNodes = gather_nodes_by_edge_in(in_edges(find_node_by_symbol(bn,node.label), bn))
@@ -204,7 +203,7 @@ function legal_configuration(bn::BayesianNetwork, cpd::CPD)
             delete!(uncheckedNodes,node)
         end
     end
-
+    
     for node in checkedNodes
         if node.label in nodes
             delete!(nodes,node.label)
@@ -232,19 +231,6 @@ function gather_nodes_by_edge_out(edges::Array{BayesianEdge,1})
     end
     e
 end
-
-function validate_conf(syms::Array{Symbol,1}, edges::Set)
-    for sym in syms
-        if !(sym in edges)
-            return false
-        end
-    end
-    true
-end
-
-get_edge_source_labels(edges::Array{BayesianEdge,1}) = unique(map(edge -> edge.source.label, edges))
-
-get_edge_target_labels(edges::Array{BayesianEdge,1}) = unique(map(edge -> edge.target.label, edges))
 
 function check_requirements(g::BayesianNetwork, cpd::CPD)
     conds = conditionals(cpd)
