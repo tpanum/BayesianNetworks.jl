@@ -187,19 +187,25 @@ multivecs{T}(::Type{T}, n::Int) = [T[] for _ =1:n]
 
 function legal_configuration(bn::BayesianNetwork, cpd::CPD)
     nodes = Set(cpd.conditionals)
-    nodesIn = Set()
-    nodesOut = Set()
+    size = 0
+    checkedNodes = Set()
+    uncheckedNodes = Set()
     for label in cpd.distribution
-        union!(nodesIn, gather_nodes_by_edge_in(in_edges(find_node_by_symbol(bn,label), bn)))
-        union!(nodesOut, gather_nodes_by_edge_out(out_edges(find_node_by_symbol(bn,label), bn)))
+        uncheckedNodes = union(Set(gather_nodes_by_edge_out(out_edges(find_node_by_symbol(bn,label), bn))), gather_nodes_by_edge_in(in_edges(find_node_by_symbol(bn,label), bn)))
     end
 
-    for node in nodesIn
-        if node.label in nodes
-            delete!(nodes,node.label)
+    while 0 < length(uncheckedNodes)
+        for node in uncheckedNodes
+            inNodes = gather_nodes_by_edge_in(in_edges(find_node_by_symbol(bn,node.label), bn))
+            outNodes = gather_nodes_by_edge_out(out_edges(find_node_by_symbol(bn,node.label), bn))
+            union!(uncheckedNodes, setdiff(inNodes,checkedNodes))
+            union!(uncheckedNodes, setdiff(outNodes,checkedNodes))
+            push!(checkedNodes,node)
+            delete!(uncheckedNodes,node)
         end
     end
-    for node in nodesOut
+
+    for node in checkedNodes
         if node.label in nodes
             delete!(nodes,node.label)
         end
@@ -209,14 +215,6 @@ function legal_configuration(bn::BayesianNetwork, cpd::CPD)
     else
         false
     end
-
-
-    #for label in cpd.conditionals
-    #    if !validate_conf(cpd.distribution,  Set(get_edge_source_labels(edgesIn))) && !validate_conf(cpd.distribution, Set(get_edge_target_labels(edgesOut)))
-    #        return false
-    #    end
-    #end
-    #true
 end
 
 function gather_nodes_by_edge_in(edges::Array{BayesianEdge,1})
