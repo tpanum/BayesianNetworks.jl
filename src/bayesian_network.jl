@@ -186,14 +186,53 @@ multivecs{T}(::Type{T}, n::Int) = [T[] for _ =1:n]
 ################################################
 
 function legal_configuration(bn::BayesianNetwork, cpd::CPD)
-    for label in cpd.conditionals
-        edgesIn = in_edges(find_node_by_symbol(bn,label), bn)
-        edgesOut = out_edges(find_node_by_symbol(bn,label), bn)
-        if !validate_conf(cpd.distribution,  Set(get_edge_source_labels(edgesIn))) && !validate_conf(cpd.distribution, Set(get_edge_target_labels(edgesOut)))
-            return false
+    nodes = Set(cpd.conditionals)
+    nodesIn = Set()
+    nodesOut = Set()
+    for label in cpd.distribution
+        union!(nodesIn, gather_nodes_by_edge_in(in_edges(find_node_by_symbol(bn,label), bn)))
+        union!(nodesOut, gather_nodes_by_edge_out(out_edges(find_node_by_symbol(bn,label), bn)))
+    end
+
+    for node in nodesIn
+        if node.label in nodes
+            delete!(nodes,node.label)
         end
     end
-    true
+    for node in nodesOut
+        if node.label in nodes
+            delete!(nodes,node.label)
+        end
+    end
+    if isempty(nodes)
+        true
+    else
+        false
+    end
+
+
+    #for label in cpd.conditionals
+    #    if !validate_conf(cpd.distribution,  Set(get_edge_source_labels(edgesIn))) && !validate_conf(cpd.distribution, Set(get_edge_target_labels(edgesOut)))
+    #        return false
+    #    end
+    #end
+    #true
+end
+
+function gather_nodes_by_edge_in(edges::Array{BayesianEdge,1})
+    e = Set()
+    for edge in edges
+        push!(e,edge.source)
+    end
+    e
+end
+
+function gather_nodes_by_edge_out(edges::Array{BayesianEdge,1})
+    e = Set()
+    for edge in edges
+        push!(e,edge.target)
+    end
+    e
 end
 
 function validate_conf(syms::Array{Symbol,1}, edges::Set)
