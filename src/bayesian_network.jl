@@ -196,7 +196,7 @@ function legal_configuration(bn::BayesianNetwork, cpd::CPD)
     true
 end
 
-function validate_conf(syms::Array{Symbol,1}, edges::Set{Symbol})
+function validate_conf(syms::Array{Symbol,1}, edges::Set)
     for sym in syms
         if !(sym in edges)
             return false
