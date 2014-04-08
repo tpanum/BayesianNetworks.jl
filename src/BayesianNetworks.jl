@@ -11,7 +11,6 @@ using Graphs
 include("utils.jl")
 include("probability_distribution.jl")
 include("probability_density_distribution.jl")
-include("cpt.jl")
 include("bayesian_node.jl")
 include("bayesian_edge.jl")
 include("cpd.jl")

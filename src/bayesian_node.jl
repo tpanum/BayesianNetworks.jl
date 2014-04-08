@@ -69,9 +69,9 @@ function has_pd(bn::CBayesianNode)
     false
 end
 
-function set_state_names(pd::ProbabilityDistribution, name::Symbol)
-    for i=1:length(states(pd,1))
-        pd.dim_states[1][i] = string(name,"{",states(pd,1)[i],"}")
+function set_state_names(pd::PDistribution, name::Symbol)
+    for i=1:length(states(pd))
+        pd.states[i] = string(name,"{",states(pd)[i],"}")
     end
     pd
 end
