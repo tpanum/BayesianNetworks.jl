@@ -1,3 +1,5 @@
+import Base: isequal, hash
+
 type CPD
     distribution::Array{Symbol,1}
     conditionals::Array{Symbol,1}
@@ -26,4 +28,12 @@ P(val::Symbol) = CPD(val, Symbol[])
 
 function ==(cpd1::CPD, cpd2::CPD)
     length(setdiff(Set(distribution(cpd1)),Set(distribution(cpd2)))) == 0 && length(setdiff(Set(conditionals(cpd1)),Set(conditionals(cpd2)))) == 0
+end
+
+function isequal(cpd1::CPD, cpd2::CPD)
+	length(setdiff(Set(distribution(cpd1)),Set(distribution(cpd2)))) == 0 && length(setdiff(Set(conditionals(cpd1)),Set(conditionals(cpd2)))) == 0
+end
+
+function hash(cpd::CPD)
+	hash((cpd.distribution,cpd.conditionals))
 end

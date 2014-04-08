@@ -65,7 +65,8 @@ export
        node_index,
        CPD,
        P,
-       valid_pdfs
+       valid_pdfs,
+       isequal
 
 
 end

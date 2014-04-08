@@ -251,10 +251,9 @@ function check_requirement(g::BayesianNetwork, cpd::CPD)
 end
 
 function cached_result(bn::BayesianNetwork, cpd::CPD)
-    for key in keys(bn.cpds)
-        if key == cpd
-            return bn.cpds[key]
-        end
+    if cpd in collect(keys(bn.cpds))
+        bn.cpds[cpd]
+    else
+        throw("Maybe a bit aggresive to throw an error for the cpd not being in the network, but oh well for now")
     end
-    throw("Maybe a bit aggresive to throw an error for the cpd not being in the network, but oh well for now")
 end
