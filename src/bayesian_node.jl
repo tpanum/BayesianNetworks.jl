@@ -9,7 +9,7 @@ type DBayesianNode <: BayesianNode
     DBayesianNode{T <: PDistribution}(_label::Symbol, _pd::T) = new(0, _label, _pd)
 end
 
-DBayesianNode{K}(_label::Symbol, _arr::Array{K,1}) = DBayesianNode(_label, UnknownPDistribution(_arr))
+DBayesianNode{K}(_label::Symbol, _arr::Array{K,1}) = DBayesianNode(_label, ProbabilityDistribution(_arr))
 
 function ==(n1::DBayesianNode, n2::DBayesianNode)
     n1.index == n2.index && n1.label == n2.label && n1.pd == n2.pd

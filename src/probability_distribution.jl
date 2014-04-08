@@ -10,7 +10,7 @@ type ProbabilityDistributionVector{T <: Real, K} <: PDistribution
     ps::Array{T,1}
 
     function ProbabilityDistributionVector(_states::Array{K,1}, _ps::Array{T,1})
-        check_pd_sum!(_ps)
+        length(_ps) > 0 ? check_pd_sum!(_ps) : nothing;
         new(_states, _ps)
     end
 end
@@ -35,6 +35,7 @@ end
 
 ProbabilityDistribution{T,K}(states::Array{K,1}, ps::Array{T,1}) = ProbabilityDistributionVector{T,K}(states, ps)
 ProbabilityDistribution{T,K,Q}(states::Array{K,1}, ps::Array{T,2}, conditionals::Array{Q,1}) = ProbabilityDistributionMatrix{T,K,Q}(states, ps, conditionals)
+ProbabilityDistribution{K}(states::Array{K,1}) = ProbabilityDistribution(states, Real[])
 
 function probabilities(pd::PDistribution)
     pd.ps
