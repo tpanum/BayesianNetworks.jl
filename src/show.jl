@@ -1,13 +1,8 @@
 import Base: show
 
-function show(io::IO, pd::ProbabilityDistribution)
+function show(io::IO, pd::PDistribution)
     x,y = map(length,states(pd))
     print(io, "ProbabilityDistribution{$(x)x$(y)}")
-end
-
-function show(io::IO, pd::UnknownPDistribution)
-    x = join(states(pd), ", ")
-    print(io, "UnknownPDistribution{$(x)}")
 end
 
 function show(io::IO, vd::DBayesianNode)
@@ -39,21 +34,6 @@ function show(io::IO, bn::BayesianNetwork)
     edges = showEdgeList(bn.edges)
     nodes = showNodeList(bn.nodes)
     print(io, "edges $edges, nodes $nodes")
-end
-
-function show(io::IO, cpt::CPT)
-    indencies=sortperm(collect(values(cpt.keys)))
-    orderedkeys=collect(keys(cpt.keys))[indencies]
-    states = "none"
-    if length(orderedkeys) > 0
-        states = join(cpt.states, ", ")
-    end
-    print(io, "cpt: {$states}")
-    for i=1:length(orderedkeys)
-        println(io,"")
-        probs = join(cpt.Ps[i,:], ", ")
-        print(io, " [$(orderedkeys[i])] {$(probs)}")
-    end
 end
 
 function showNodeList(nodes::Array{BayesianNode,1})
