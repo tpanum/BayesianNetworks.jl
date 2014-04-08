@@ -155,7 +155,7 @@ function in_edges{V <: BayesianNode}(n::V, g::BayesianNetwork)
 end
 
 in_degree{V <: BayesianNode}(n::V, g::BayesianNetwork) = length(in_edges(n, g))
-in_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = SourceIterator(g, in_edges(n, g))
+in_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = map(e -> e.source, in_edges(n, g))
 
 function out_edges{V <: BayesianNode}(n::V, g::BayesianNetwork)
     if !node_in_network(g, n)
@@ -166,7 +166,7 @@ function out_edges{V <: BayesianNode}(n::V, g::BayesianNetwork)
 end
 
 out_degree{V <: BayesianNode}(n::V, g::BayesianNetwork) = length(out_edges(n, g))
-out_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = TargetIterator(g, out_edges(n, g))
+out_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = map(e -> e.target, out_edges(n, g))
 
 function add_probability!(g::BayesianNetwork, cpd::CPD, pdd::ProbabilityDensityDistribution)
     if symbols_in_network(g, distribution(cpd)) && symbols_in_network(g, conditionals(cpd))
@@ -229,45 +229,3 @@ function check_requirement(g::BayesianNetwork, cpd::CPD)
         false
     end
 end
-
-#################################################
-#
-#  iteration
-#
-################################################
-
-# iterating over targets
-
-immutable TargetIterator{G<:AbstractGraph,EList}
-    g::G
-    lst::EList
-end
-
-TargetIterator{G<:AbstractGraph,EList}(g::G, lst::EList) =
-    TargetIterator{G,EList}(g, lst)
-
-length(a::TargetIterator) = length(a.lst)
-isempty(a::TargetIterator) = isempty(a.lst)
-getindex(a::TargetIterator, i::Integer) = target(a.lst[i])
-
-start(a::TargetIterator) = start(a.lst)
-done(a::TargetIterator, s) = done(a.lst, s)
-next(a::TargetIterator, s::Int) = ((e, s) = next(a.lst, s); (target(e), s))
-
-# iterating over sources
-
-immutable SourceIterator{G<:AbstractGraph,EList}
-    g::G
-    lst::EList
-end
-
-SourceIterator{G<:AbstractGraph,EList}(g::G, lst::EList) =
-    SourceIterator{G,EList}(g, lst)
-
-length(a::SourceIterator) = length(a.lst)
-isempty(a::SourceIterator) = isempty(a.lst)
-getindex(a::SourceIterator, i::Integer) = source(a.lst[i])
-
-start(a::SourceIterator) = start(a.lst)
-done(a::SourceIterator, s) = done(a.lst, s)
-next(a::SourceIterator, s::Int) = ((e, s) = next(a.lst, s); (source(e), s))
