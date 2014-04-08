@@ -177,6 +177,42 @@ function add_probability!(g::BayesianNetwork, cpd::CPD, pdd::ProbabilityDensityD
     end
 end
 
+function legal_configuration(bn::BayesianNetwork, cpd::CPD)
+    for label in cpd.conditionals
+        edgesIn = get_edge_source_labels(in_edges(find_node_by_symbol(bn,label), bn))
+        edgesOut = get_edge_target_labels(out_edges(find_node_by_symbol(bn,label), bn))
+        if !validate_conf(cpd.distribution, edgesIn) && !validate_conf(cpd.distribution, edgesOut)
+            return false
+        end
+    end 
+    true
+end
+
+function validate_conf(syms::Array{Symbol,1}, edges::Array{Symbol,1})
+    for sym in syms
+        if !(sym in edges)
+            return false
+        end
+    end
+    true
+end
+
+function get_edge_source_labels(edges::Array{BayesianEdge,1})
+    labels = Array(Symbol,0)
+    for edge in edges
+        push!(labels, edge.source.label)
+    end
+    labels
+end
+
+function get_edge_target_labels(edges::Array{BayesianEdge,1})
+    labels = Array(Symbol,0)
+    for edge in edges
+        push!(labels, edge.target.label)
+    end
+    labels
+end
+
 multivecs{T}(::Type{T}, n::Int) = [T[] for _ =1:n]
 
 #################################################
