@@ -48,6 +48,7 @@ export
        nodes_in_network,
        add_probability!,
        legal_configuration,
+       check_requirements,
 
        PDistribution,
        UnknownPDistribution,

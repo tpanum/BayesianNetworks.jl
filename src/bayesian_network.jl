@@ -168,12 +168,18 @@ end
 out_degree{V <: BayesianNode}(n::V, g::BayesianNetwork) = length(out_edges(n, g))
 out_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = map(e -> e.target, out_edges(n, g))
 
-function add_probability!(g::BayesianNetwork, cpd::CPD, pdd::ProbabilityDensityDistribution)
+function add_probability!{V <: PDistribution}(g::BayesianNetwork, cpd::CPD, pd::V)
     if symbols_in_network(g, distribution(cpd)) && symbols_in_network(g, conditionals(cpd))
-        g.cpds[cpd] = pdd
+        g.cpds[cpd] = pd
         true
     else
         false
+    end
+end
+
+function joint_probability_distribution(bn::BayesianNetwork, cpd::CPD)
+    if length(conditionals(cpd)) == 0
+        [ P(d|in_neighbors(d)) for d in distribution(cpd) ]
     end
 end
 
@@ -214,16 +220,16 @@ function check_requirements(g::BayesianNetwork, cpd::CPD)
     dist = distribution(cpd)
     to_check = [P(conds|dist), P(conds), P(dist)]
     for i in to_check
-        if check_requirement(g, i) == false
+        if get_cpd(g, i) == false
             return false
         end
     end
     true
 end
 
-function check_requirement(g::BayesianNetwork, cpd::CPD)
+function get_cpd(g::BayesianNetwork, cpd::CPD)
     try
-        cpds(g)[cpd]
+        getindex(cpds(g),cpd)
     catch
         false
     end

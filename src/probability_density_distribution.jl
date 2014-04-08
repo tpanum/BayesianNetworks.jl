@@ -1,4 +1,4 @@
-type ProbabilityDensityDistribution{V}
+type ProbabilityDensityDistribution{V} <: PDistribution
 	states::Array{V,1}
 	pdfs::Array{Function,1}
 
