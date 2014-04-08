@@ -18,10 +18,7 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
             map(x -> assign_index(x[2],x[1]), enumerate(_nodes))
             for _n in _nodes
                 if has_pd(_n)
-                    ####################################
-                    ##Add input when decided what it should be
-                    ###################################
-                    _cpds[CPD(_n.label)] = null
+                    _cpds[CPD(_n.label)] = _n.pd
                 end
             end
         end
@@ -60,7 +57,7 @@ end
 function add_node!{T <: BayesianNode}(g::BayesianNetwork, n::T)
     ##Update what is put into the cpds dictionary when decided
     if typeof(n) == DBayesianNode && has_pd(n)
-        g.cpds[CPD(n.label, [])] = null
+        g.cpds[CPD(n.label, [])] = n.pd
         ##Check just made in case someone construct a graph in an non-obvious manner, will probably not be run
         if length(in_edges(n, g)) > 0
             g.cpds[CPD(n.label, [edge.source.label for edge in in_edges(n, g)])] = null
@@ -203,7 +200,7 @@ function legal_configuration(bn::BayesianNetwork, cpd::CPD)
             delete!(uncheckedNodes,node)
         end
     end
-    
+
     for node in checkedNodes
         if node.label in nodes
             delete!(nodes,node.label)
@@ -251,4 +248,13 @@ function check_requirement(g::BayesianNetwork, cpd::CPD)
     catch
         false
     end
+end
+
+function cached_result(bn::BayesianNetwork, cpd::CPD)
+    for key in keys(bn.cpds)
+        if key == cpd
+            return bn.cpds[key]
+        end
+    end
+    throw("Maybe a bit aggresive to throw an error for the cpd not being in the network, but oh well for now")
 end

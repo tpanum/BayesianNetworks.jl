@@ -22,6 +22,7 @@ oe1 = out_edges(a1, n1)
 
 add_node!(n1, a1)
 
+@test cached_result(n1,P(:hulu)) == pd1
 @test length(n1.binclist) == 1
 @test length(n1.finclist) == 1
 
