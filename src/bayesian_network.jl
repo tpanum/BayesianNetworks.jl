@@ -179,16 +179,16 @@ end
 
 function legal_configuration(bn::BayesianNetwork, cpd::CPD)
     for label in cpd.conditionals
-        edgesIn = get_edge_source_labels(in_edges(find_node_by_symbol(bn,label), bn))
-        edgesOut = get_edge_target_labels(out_edges(find_node_by_symbol(bn,label), bn))
-        if !validate_conf(cpd.distribution, edgesIn) && !validate_conf(cpd.distribution, edgesOut)
+        edgesIn = in_edges(find_node_by_symbol(bn,label), bn)
+        edgesOut = out_edges(find_node_by_symbol(bn,label), bn)
+        if !validate_conf(cpd.distribution,  Set(get_edge_source_labels(edgesIn))) && !validate_conf(cpd.distribution, Set(get_edge_target_labels(edgesOut)))
             return false
         end
     end 
     true
 end
 
-function validate_conf(syms::Array{Symbol,1}, edges::Array{Symbol,1})
+function validate_conf(syms::Array{Symbol,1}, edges::Set{Symbol})
     for sym in syms
         if !(sym in edges)
             return false

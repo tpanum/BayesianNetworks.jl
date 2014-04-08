@@ -105,6 +105,7 @@ add_edge!(n4,d3,d1)
 @test legal_configuration(n4, CPD([:esben], [:pilgaard,:moller])) == true
 @test legal_configuration(n4, CPD([:pilgaard,:moller], [:esben])) == true
 @test legal_configuration(n4, CPD([:pilgaard,:moller], [:retard_node])) == false
+@test legal_configuration(n4, CPD([:pilgaard], [:retard_node, :esben])) == false
 
 ###################################
 #Tests that should cause errors
