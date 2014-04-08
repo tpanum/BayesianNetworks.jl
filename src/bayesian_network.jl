@@ -181,6 +181,33 @@ multivecs{T}(::Type{T}, n::Int) = [T[] for _ =1:n]
 
 #################################################
 #
+#  query
+#
+################################################
+
+function check_requirements(g::BayesianNetwork, cpd::CPD)
+    conds = conditionals(cpd)
+    dist = distribution(cpd)
+    to_check = [P(conds|dist), P(conds), P(dist)]
+    the_check
+    for i in to_check
+        if check_requirement(g, i) == false
+            return false
+        end
+    end
+    true
+end
+
+function check_requirement(g::BayesianNetwork, cpd::CPD)
+    try
+        cpds(g)[cpd]
+    catch
+        false
+    end
+end
+
+#################################################
+#
 #  iteration
 #
 ################################################
