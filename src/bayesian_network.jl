@@ -184,7 +184,7 @@ function legal_configuration(bn::BayesianNetwork, cpd::CPD)
         if !validate_conf(cpd.distribution, edgesIn) && !validate_conf(cpd.distribution, edgesOut)
             return false
         end
-    end 
+    end
     true
 end
 
@@ -197,21 +197,9 @@ function validate_conf(syms::Array{Symbol,1}, edges::Array{Symbol,1})
     true
 end
 
-function get_edge_source_labels(edges::Array{BayesianEdge,1})
-    labels = Array(Symbol,0)
-    for edge in edges
-        push!(labels, edge.source.label)
-    end
-    labels
-end
+get_edge_source_labels(edges::Array{BayesianEdge,1}) = unique(map(edge -> edge.source.label, edges))
 
-function get_edge_target_labels(edges::Array{BayesianEdge,1})
-    labels = Array(Symbol,0)
-    for edge in edges
-        push!(labels, edge.target.label)
-    end
-    labels
-end
+get_edge_target_labels(edges::Array{BayesianEdge,1}) = unique(map(edge -> edge.target.label, edges))
 
 multivecs{T}(::Type{T}, n::Int) = [T[] for _ =1:n]
 
