@@ -177,6 +177,14 @@ function add_probability!(g::BayesianNetwork, cpd::CPD, pdd::ProbabilityDensityD
     end
 end
 
+multivecs{T}(::Type{T}, n::Int) = [T[] for _ =1:n]
+
+#################################################
+#
+#  query
+#
+################################################
+
 function legal_configuration(bn::BayesianNetwork, cpd::CPD)
     for label in cpd.conditionals
         edgesIn = in_edges(find_node_by_symbol(bn,label), bn)
@@ -200,14 +208,6 @@ end
 get_edge_source_labels(edges::Array{BayesianEdge,1}) = unique(map(edge -> edge.source.label, edges))
 
 get_edge_target_labels(edges::Array{BayesianEdge,1}) = unique(map(edge -> edge.target.label, edges))
-
-multivecs{T}(::Type{T}, n::Int) = [T[] for _ =1:n]
-
-#################################################
-#
-#  query
-#
-################################################
 
 function check_requirements(g::BayesianNetwork, cpd::CPD)
     conds = conditionals(cpd)
