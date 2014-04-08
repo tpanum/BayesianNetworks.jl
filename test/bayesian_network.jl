@@ -22,6 +22,7 @@ oe1 = out_edges(a1, n1)
 
 add_node!(n1, a1)
 
+@test cached_result(n1,P(:hulu)) == pd1
 @test length(n1.binclist) == 1
 @test length(n1.finclist) == 1
 
@@ -89,28 +90,57 @@ e1 = add_edge!(n3,c2,c3)
 @test node_index(b1) == 1
 
 ###################################
-
-pd7 = ProbabilityDistribution(["head","tails"],[0.46,0.54])
-pd8 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
-pd9 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
-pd10 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
-d1 = DBayesianNode(:esben, pd7)
-d2 = DBayesianNode(:pilgaard, pd8)
-d3 = DBayesianNode(:moller, pd9)
-d4 = DBayesianNode(:retard_node, pd10)
-n4 = BayesianNetwork([d1,d2,d3, d4],[])
-
-add_edge!(n4,d2,d1)
-add_edge!(n4,d3,d1)
-@test legal_configuration(n4, CPD([:esben], [:pilgaard,:moller])) == true
-@test legal_configuration(n4, CPD([:pilgaard,:moller], [:esben])) == true
-@test legal_configuration(n4, CPD([:pilgaard,:moller], [:retard_node])) == false
-@test legal_configuration(n4, CPD([:pilgaard], [:retard_node, :esben])) == false
-
-###################################
 #Tests that should cause errors
 ###################################
 @test_throws add_edge!(n3,b1,b2)
 @test_throws add_edge!(n3,c3,c1)
 @test_throws q1 = DBayesianNode("hej", pd3)
 @test_throws q1 = CBayesianNode("Hej", x -> 1)
+
+###################################
+
+pd7 = ProbabilityDistribution(["head","tails"],[0.46,0.54])
+pd8 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
+pd9 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
+pd10 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
+pd11 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
+pd12 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
+pd13 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
+pd14 = ProbabilityDistribution(["head","tails"],[0.99,0.01])
+d1 = DBayesianNode(:d1, pd7)
+d2 = DBayesianNode(:d2, pd8)
+d3 = DBayesianNode(:d3, pd9)
+d4 = DBayesianNode(:d4, pd10)
+d5 = DBayesianNode(:d5, pd11)
+d6 = DBayesianNode(:d6, pd12)
+d7 = DBayesianNode(:d7, pd13)
+d8 = DBayesianNode(:d8, pd14)
+n4 = BayesianNetwork([d1,d2,d3,d4,d5,d6,d7,d8],[])
+
+add_edge!(n4,d2,d1)
+add_edge!(n4,d3,d1)
+add_edge!(n4,d6,d7)
+add_edge!(n4,d7,d2)
+add_edge!(n4,d8,d5)
+add_edge!(n4,d1,d5)
+
+@test legal_configuration(n4, CPD([:d1], [:d2,:d3])) == true
+@test legal_configuration(n4, CPD([:d2,:d3], [:d1])) == true
+@test legal_configuration(n4, CPD([:d1], [:d2,:d3,:d5,:d6,:d7,:d8])) == true
+@test legal_configuration(n4, CPD([:d1], [:d2,:d3,:d8])) == true
+@test legal_configuration(n4, CPD([:d2,:d3], [:d4])) == false
+@test legal_configuration(n4, CPD([:d2], [:d4, :d1])) == false
+
+####################################
+
+pdbhs1 = ProbabilityDistribution(["head", "tails"], [0.5,0.5])
+pdbhs2 = ProbabilityDistribution(["head", "tails"], [0.75,0.25])
+abhs1 = DBayesianNode(:R, pdbhs1)
+abhs2 = DBayesianNode(:S, pdbhs2)
+
+nbhs1 = BayesianNetwork([abhs1, abhs2])
+add_edge!(nbhs1, abhs1, abhs2)
+
+@test check_requirements(nbhs1, P(:S|:R)) == false
+add_probability!(nbhs1, P(:R|:S), ProbabilityDistribution(["head", "tails"], [0.33, 0.67]))
+@test check_requirements(nbhs1, P(:S|:R)) == true

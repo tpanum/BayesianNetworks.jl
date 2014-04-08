@@ -47,6 +47,8 @@ export
        nodes_in_network,
        add_probability!,
        legal_configuration,
+       check_requirements,
+       cached_result,
 
        PDistribution,
        UnknownPDistribution,
@@ -64,7 +66,8 @@ export
        node_index,
        CPD,
        P,
-       valid_pdfs
+       valid_pdfs,
+       isequal
 
 
 end
