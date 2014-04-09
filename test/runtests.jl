@@ -7,9 +7,12 @@ function add_test_package(file::ASCIIString)
     try
         include(file)
         delta_time=round(time()-start_time,2)
-        println("[\u2713] $file ($(delta_time)s)")
+        print("[")
+        print_with_color(:green,"\e[92m\u2713\e[0m")
+        print("] $file ($(delta_time)s)\n") 
     catch e
-        println(e)
+        println("[\e[31mx\e[0m] $file")
+        throw(e)
     end
 end
 add_test_package("utility.jl")
