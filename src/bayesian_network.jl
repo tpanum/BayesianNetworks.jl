@@ -252,3 +252,50 @@ function cached_result(bn::BayesianNetwork, cpd::CPD)
         false
     end
 end
+
+function testquery(bn::BayesianNetwork, cpd::CPD)
+    res = Dict()
+    if legal_configuration(bn,cpd)
+        if cached_result(bn,cpd) != false
+            res = cached_result(bn,cpd) 
+        elseif check_requirements(bn, cpd)
+            res = calculate_probabilities(bn,cpd)
+        elsw
+            throw("Invalid configuration")
+        end
+    end
+    
+    res
+end
+
+function calculate_probabilities(bn::BayesianNetwork, cpd::CPD)
+    res = Dict()
+    temp = create_probabilities(cpd)
+    for p in temp
+        calculate_probability!(res, cached_result(bn, p), cpd.parameters[p.distribution[1]])
+    end
+    for key in keys(res)
+        res[key] = prod(res[key])
+    end
+    res
+end
+
+function create_probabilities(cpd::CPD)
+    res = Array(CPD,0)
+    for cond in cpd.conditionals
+        push!(res, CPD(cond,cpd.distribution))
+    end
+    res
+end
+
+function calculate_probability!(dict, dist::ProbabilityDensityDistribution, v)
+    for state in states(dist)
+        if !(state in collect(keys(dict)))
+            dict[state] = Array(Float64,0)
+        end
+    end
+
+    for i = 1:length(states(dist))
+        push!(dict[states(dist)[i]],pdfs(dist)[i](v))
+    end
+end
