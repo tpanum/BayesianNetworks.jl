@@ -31,11 +31,13 @@ P(vals::Array{Symbol,1}) = CPD(vals, Symbol[])
 |(bn1::Array{Symbol,1}, bn2::Dict) = (bn1,bn2)
 
 function ==(cpd1::CPD, cpd2::CPD)
-    length(setdiff(Set(distribution(cpd1)),Set(distribution(cpd2)))) == 0 && length(setdiff(Set(conditionals(cpd1)),Set(conditionals(cpd2)))) == 0
+    length(setdiff(Set(distribution(cpd1)),Set(distribution(cpd2)))) == 0 && length(setdiff(Set(conditionals(cpd1)),Set(conditionals(cpd2)))) == 0 &&
+    length(setdiff(Set(distribution(cpd2)),Set(distribution(cpd1)))) == 0 && length(setdiff(Set(conditionals(cpd2)),Set(conditionals(cpd1)))) == 0
 end
 
 function isequal(cpd1::CPD, cpd2::CPD)
-	length(setdiff(Set(distribution(cpd1)),Set(distribution(cpd2)))) == 0 && length(setdiff(Set(conditionals(cpd1)),Set(conditionals(cpd2)))) == 0
+	length(setdiff(Set(distribution(cpd1)),Set(distribution(cpd2)))) == 0 && length(setdiff(Set(conditionals(cpd1)),Set(conditionals(cpd2)))) == 0 &&
+    length(setdiff(Set(distribution(cpd2)),Set(distribution(cpd1)))) == 0 && length(setdiff(Set(conditionals(cpd2)),Set(conditionals(cpd1)))) == 0
 end
 
 function hash(cpd::CPD)

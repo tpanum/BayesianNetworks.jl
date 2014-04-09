@@ -249,6 +249,6 @@ function cached_result(bn::BayesianNetwork, cpd::CPD)
     if cpd in collect(keys(bn.cpds))
         bn.cpds[cpd]
     else
-        throw("Maybe a bit aggresive to throw an error for the cpd not being in the network, but oh well for now")
+        false
     end
 end

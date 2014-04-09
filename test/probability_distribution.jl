@@ -32,6 +32,10 @@ pd4 = ProbabilityDistribution(["one", "two", "three", "four", "five", "six"], [0
 
 @test_throws pd4 = ProbabilityDistribution(["one", "two", "three", "four", "five", "six"], [0.2, 0.2, 0.2, 0.2, 0.2, 0.2])
 
-pd4 = ProbabilityDistribution(["rain","sun"], [0.5,0.5])
+pd4 = ProbabilityDistribution(["rain","sun"], [0.6,0.4])
 
-@test length(states(pd1*pd4)) == 4
+j_pd1_pd4=pd1*pd4
+
+@test length(states(j_pd1_pd4)) == 4
+@test_throws p2*p3
+@test_approx_eq j_pd1_pd4[Set{ASCIIString}({"head","rain"})] 0.3
