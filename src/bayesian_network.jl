@@ -18,7 +18,9 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
             map(x -> assign_index(x[2],x[1]), enumerate(_nodes))
             for _n in _nodes
                 if has_pd(_n)
-                    _cpds[CPD(_n.label)] = _n.pd
+                    if length(probabilities(_n.pd)) > 0
+                        _cpds[CPD(_n.label)] = _n.pd
+                    end
                 end
             end
         end
@@ -102,9 +104,9 @@ end
 
 function add_cpd_for_edge!(g::BayesianNetwork, s::BayesianNode,t::BayesianNode)
     if typeof(s) == DBayesianNode && has_pd(s) && has_pd(t)
-        g.cpds[CPD(t.label, [edge.source.label for edge in in_edges(t,g)])] = null
+        # g.cpds[CPD(t.label, [edge.source.label for edge in in_edges(t,g)])] = null
     else
-        g.cpds[CPD(t.label, s.label)] = null
+        # g.cpds[CPD(t.label, s.label)] = null
     end
 end
 
