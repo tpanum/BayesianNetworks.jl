@@ -3,13 +3,15 @@ import Base: isequal, hash
 type CPD
     distribution::Array{Symbol,1}
     conditionals::Array{Symbol,1}
-    parameters::Dict{Symbol, Function}
+    parameters::Dict{Symbol, Any}
 
-    CPD(bn::Array, conds::Array) = new(bn, conds, Dict{Symbol,Function}())
+    CPD(bn::Array, conds::Array) = new(bn, conds, Dict{Symbol,Any}())
     CPD(bn::Symbol) = CPD([bn],[])
     CPD(bn::Symbol, conds::Array) = CPD([bn],conds)
     CPD(dists::Array, bn::Symbol) = CPD(dists,[bn])
     CPD(bn1::Symbol, bn2::Symbol) = CPD([bn1],[bn2])
+    CPD(bn::Array, d::Dict) = new(bn, collect(keys(d)), d)
+    CPD(bn::Symbol, d::Dict) = new([bn], collect(keys(d)), d)
 end
 
 distribution(cpd::CPD) = cpd.distribution

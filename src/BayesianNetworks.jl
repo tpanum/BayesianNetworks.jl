@@ -67,7 +67,8 @@ export
        CPD,
        P,
        valid_pdfs,
-       isequal
+       isequal,
+       testquery
 
 
 end
