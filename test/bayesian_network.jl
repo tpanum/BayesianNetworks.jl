@@ -131,19 +131,32 @@ add_edge!(n4,d1,d5)
 @test legal_configuration(n4, CPD([:d2,:d3], [:d4])) == false
 @test legal_configuration(n4, CPD([:d2], [:d4, :d1])) == false
 
-@test cached_result(n4, P(:d1|:d2)) != false
+@test cached_result(n4, P(:d1)) != false
+@test cached_result(n4, P(:d9)) == false
+@test cached_result(n4, P(:d1|:d2)) == false
 @test cached_result(n4, P(:d4|:d2)) == false
 
 ####################################
 
 pdbhs1 = ProbabilityDistribution(["head", "tails"], [0.5,0.5])
 pdbhs2 = ProbabilityDistribution(["head", "tails"], [0.75,0.25])
+pdbhs3 = ProbabilityDistribution(["head", "tails"], [0.33,0.67])
 abhs1 = DBayesianNode(:R, pdbhs1)
 abhs2 = DBayesianNode(:S, pdbhs2)
+abhs3 = DBayesianNode(:D, pdbhs3)
 
-nbhs1 = BayesianNetwork([abhs1, abhs2])
+nbhs1 = BayesianNetwork([abhs1, abhs2, abhs3])
 add_edge!(nbhs1, abhs1, abhs2)
+add_edge!(nbhs1, abhs1, abhs3)
+add_edge!(nbhs1, abhs2, abhs3)
 
+@test check_requirements(nbhs1, P(:R|:S)) == false
 @test check_requirements(nbhs1, P(:S|:R)) == false
 add_probability!(nbhs1, P(:R|:S), ProbabilityDistribution(["head", "tails"], [0.33, 0.67]))
 @test check_requirements(nbhs1, P(:S|:R)) == true
+
+@test check_requirements(nbhs1, P(:D|[:R,:S])) == false
+add_probability!(nbhs1, P([:R,:S]|:D), ProbabilityDistribution(["head", "tails"], [0.20, 0.80]))
+@test check_requirements(nbhs1, P(:D|[:R,:S])) == false
+add_probability!(nbhs1, P([:R,:S]), ProbabilityDistribution(["head", "tails"], [0.40, 0.60]))
+@test check_requirements(nbhs1, P(:D|[:R,:S])) == true
