@@ -4,12 +4,14 @@ abstract PDistribution
 
 check_pd_sum!{N <: Real}(_ps::Array{N,1}) = sum(_ps) != 1 ? throw("Probability Distributions must sum to 1") : true;
 check_pd_sum!{N <: Real}(_ps::Array{N,2}) = sum(_ps) != size(_ps,1) ? throw("Conditional Probability Distributions must consist of probability distributions which sum to 1") : true;
+check_unique!(s1) = !(length(s1) == length(unique(s1))) ? throw("States must be unique") : true;
 
 type ProbabilityDistributionVector{T <: Real, K} <: PDistribution
     states::Array{K,1}
     ps::Array{T,1}
 
     function ProbabilityDistributionVector(_states::Array{K,1}, _ps::Array{T,1})
+        check_unique!(_states)
         length(_ps) > 0 ? check_pd_sum!(_ps) : nothing;
         new(_states, _ps)
     end
@@ -21,6 +23,7 @@ type ProbabilityDistributionMatrix{T <: Real, K, Q} <: PDistribution
     conditionals::Array{Q,1}
 
     function ProbabilityDistributionMatrix(_states::Array{K,1}, _ps::Array{T,2}, _conditionals::Array{Q,1})
+        check_unique!(_states)
         check_pd_sum!(_ps)
         new(_states, _ps, _conditionals)
     end
@@ -58,7 +61,6 @@ function getindex{K}(pd::PDistribution, key::K)
         # is matrix
         pd.ps[:,key .== states(pd)]
     end
-
 end
 
 ## Later...
@@ -82,7 +84,15 @@ function lpd{K}(states::K)
     ProbabilityDistribution(pb, states)
 end
 
+function unique_states(p1::PDistribution, p2::PDistribution)
+    length(setdiff(Set(states(p1)), Set(states(p2)))) == length(states(p1))
+end
+
 function *(p1::ProbabilityDistributionVector, p2::ProbabilityDistributionVector)
+    if !unique_states(p1,p2)
+        throw("State conflict")
+    end
+    
     ps_m=probabilities(p1)'.*probabilities(p2)
     s_p1=states(p1)
     s_p2=states(p2)
@@ -92,13 +102,13 @@ function *(p1::ProbabilityDistributionVector, p2::ProbabilityDistributionVector)
     ## indencies=find(triu(ones(Bool, size(ps_m,1), size(ps_m,2))))
     
     common_type=promote_type(eltype(s_p1), eltype(s_p2))
-    j_states=Array(Array{common_type,1}, combinations)
+    j_states=Array(Set{common_type}, combinations)
 
     size_ps_m=size(ps_m)
     
     for i=1:combinations
         p1_s_index, p2_s_index = single_to_multi_index(i, size_ps_m)
-        j_states[i]=common_type[s_p1[p1_s_index], s_p2[p2_s_index]]
+        j_states[i]=Set{common_type}({s_p1[p1_s_index], s_p2[p2_s_index]})
     end
     
     ProbabilityDistribution(j_states, reshape(ps_m, combinations))
