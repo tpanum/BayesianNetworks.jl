@@ -4,9 +4,13 @@ using Base.Test
 
 function add_test_package(file::ASCIIString)
     start_time=time()
-    include(file)
-    delta_time=round(time()-start_time,2)
-    println("[\u2713] $file ($(delta_time)s)")
+    try
+        include(file)
+        delta_time=round(time()-start_time,2)
+        println("[\u2713] $file ($(delta_time)s)")
+    catch e
+        println(e)
+    end
 end
 add_test_package("utility.jl")
 add_test_package("probability_distribution.jl")
