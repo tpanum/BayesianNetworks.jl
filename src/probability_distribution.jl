@@ -50,7 +50,7 @@ end
 
 function getindex{K}(pd::PDistribution, key::K)
     states(pd)::Array{K,1}
-    
+
     if !(key in states(pd))
         throw("Invalid key")
     end
@@ -92,7 +92,7 @@ function *(p1::ProbabilityDistributionVector, p2::ProbabilityDistributionVector)
     if !unique_states(p1,p2)
         throw("State conflict")
     end
-    
+
     ps_m=probabilities(p1)'.*probabilities(p2)
     s_p1=states(p1)
     s_p2=states(p2)
@@ -100,17 +100,17 @@ function *(p1::ProbabilityDistributionVector, p2::ProbabilityDistributionVector)
     combinations=length(s_p1)*length(s_p2)
     # indexes of values to in the ps_m
     ## indencies=find(triu(ones(Bool, size(ps_m,1), size(ps_m,2))))
-    
+
     common_type=promote_type(eltype(s_p1), eltype(s_p2))
     j_states=Array(Set{common_type}, combinations)
 
     size_ps_m=size(ps_m)
-    
+
     for i=1:combinations
         p1_s_index, p2_s_index = single_to_multi_index(i, size_ps_m)
         j_states[i]=Set{common_type}({s_p1[p1_s_index], s_p2[p2_s_index]})
     end
-    
+
     ProbabilityDistribution(j_states, reshape(ps_m, combinations))
 end
 
@@ -134,17 +134,17 @@ end
 function *(p1::ProbabilityDistributionMatrix, p2::ProbabilityDistributionVector)
     c_p1 = conditionals(p1)
     s_p2 = states(p2)
-    
+
     !unsorted_equality(c_p1, s_p2) ? throw("State mismatch") : nothing;
-    
+
     p1_order=sortperm(c_p1)
     p2_order=sortperm(s_p2)
-    
-    sorted_ps_m=probabilities(p1)[:,p1_order] .* probabilities(p2)[p2_order]
-    sorted_ps=reshape(sorted_ps_m[:,p1_order], length(sorted_ps_m))
+
+    sorted_ps_m=probabilities(p1)[p1_order,:] .* probabilities(p2)[p2_order]
+    sorted_ps=reshape(sorted_ps_m[p1_order,:], length(sorted_ps_m))
 
     l_p2_elems = reduce(vcat, map(x -> fill(x, length(c_p1)), states(p1)))
-    l_p1_sets = reduce(vcat, map(x -> c_p1, [1:length(s_p2)]))
+    l_p1_sets = reduce(vcat, map(x -> c_p1, [1:length(states(p1))]))
 
     ProbabilityDistribution(zip_sets(l_p1_sets, l_p2_elems), sorted_ps)
 end
