@@ -30,11 +30,11 @@ type ProbabilityDistributionMatrix{T <: Real, K, Q} <: PDistribution
 end
 
 states(pd::PDistribution) = pd.states
-conditionals(pd::PDistribution) = pd.conditionals
+conditionals(pd::ProbabilityDistributionMatrix) = pd.conditionals
 
-function ==(pd1::PDistribution, pd2::PDistribution)
-    length(setdiff(Set(states(pd1)),Set(states(pd2)))) == 0
-end
+unsorted_equality(arr1::Array, arr2::Array) = length(setdiff(Set(arr1),Set(arr2))) == 0
+
+==(pd1::PDistribution, pd2::PDistribution) = unsorted_equality(states(pd1),states(pd2))
 
 ProbabilityDistribution{T,K}(states::Array{K,1}, ps::Array{T,1}) = ProbabilityDistributionVector{T,K}(states, ps)
 ProbabilityDistribution{T,K,Q}(states::Array{K,1}, ps::Array{T,2}, conditionals::Array{Q,1}) = ProbabilityDistributionMatrix{T,K,Q}(states, ps, conditionals)
@@ -112,4 +112,39 @@ function *(p1::ProbabilityDistributionVector, p2::ProbabilityDistributionVector)
     end
     
     ProbabilityDistribution(j_states, reshape(ps_m, combinations))
+end
+
+function join_sets{K}(x::Set{K}, y)
+    c_type=promote_type(K,typeof(y))
+    Set{c_type}(c_type[collect(x),y])
+end
+
+function join_sets(x, y)
+    c_type=promote_type(typeof(x),typeof(y))
+    Set{c_type}(c_type[x,y])
+end
+
+function zip_sets(arr1::Array, arr2::Array)
+    if length(arr1) != length(arr2)
+        throw("Length of given arrays must be the same.")
+    end
+    [ join_sets(arr1[i], arr2[i]) for i=1:length(arr1) ]
+end
+
+function *(p1::ProbabilityDistributionMatrix, p2::ProbabilityDistributionVector)
+    c_p1 = conditionals(p1)
+    s_p2 = states(p2)
+    
+    !unsorted_equality(c_p1, s_p2) ? throw("State mismatch") : nothing;
+    
+    p1_order=sortperm(c_p1)
+    p2_order=sortperm(s_p2)
+    
+    sorted_ps_m=probabilities(p1)[:,p1_order] .* probabilities(p2)[p2_order]
+    sorted_ps=reshape(sorted_ps_m[:,p1_order], length(sorted_ps_m))
+
+    l_p2_elems = reduce(vcat, map(x -> fill(x, length(c_p1)), states(p1)))
+    l_p1_sets = reduce(vcat, map(x -> c_p1, [1:length(s_p2)]))
+
+    ProbabilityDistribution(zip_sets(l_p1_sets, l_p2_elems), sorted_ps)
 end
