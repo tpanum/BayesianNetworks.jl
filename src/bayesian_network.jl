@@ -260,11 +260,10 @@ function testquery(bn::BayesianNetwork, cpd::CPD)
             res = cached_result(bn,cpd) 
         elseif check_requirements(bn, cpd)
             res = calculate_probabilities(bn,cpd)
-        elsw
+        else
             throw("Invalid configuration")
         end
-    end
-    
+    end 
     res
 end
 
