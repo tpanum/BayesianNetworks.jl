@@ -219,21 +219,9 @@ function legal_configuration(bn::BayesianNetwork, cpd::CPD)
     end
 end
 
-function gather_nodes_by_edge_in(edges::Array{BayesianEdge,1})
-    e = Set()
-    for edge in edges
-        push!(e,edge.source)
-    end
-    e
-end
+gather_nodes_by_edge_in(edges::Array{BayesianEdge,1}) = Set(map(edge -> edge.source, edges))
 
-function gather_nodes_by_edge_out(edges::Array{BayesianEdge,1})
-    e = Set()
-    for edge in edges
-        push!(e,edge.target)
-    end
-    e
-end
+gather_nodes_by_edge_out(edges::Array{BayesianEdge,1}) = Set(map(edge -> edge.target, edges))
 
 function check_requirements(g::BayesianNetwork, cpd::CPD)
     conds = conditionals(cpd)
@@ -259,6 +247,6 @@ function cached_result(bn::BayesianNetwork, cpd::CPD)
     if cpd in collect(keys(bn.cpds))
         bn.cpds[cpd]
     else
-        throw("Maybe a bit aggresive to throw an error for the cpd not being in the network, but oh well for now")
+        false
     end
 end
