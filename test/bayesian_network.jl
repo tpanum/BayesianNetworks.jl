@@ -131,7 +131,9 @@ add_edge!(n4,d1,d5)
 @test legal_configuration(n4, CPD([:d2,:d3], [:d4])) == false
 @test legal_configuration(n4, CPD([:d2], [:d4, :d1])) == false
 
-@test cached_result(n4, P(:d1|:d2)) != false
+@test cached_result(n4, P(:d1)) != false
+@test cached_result(n4, P(:d9)) == false
+@test cached_result(n4, P(:d1|:d2)) == false
 @test cached_result(n4, P(:d4|:d2)) == false
 
 ####################################

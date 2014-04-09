@@ -246,8 +246,8 @@ function get_cpd(g::BayesianNetwork, cpd::CPD)
 end
 
 function cached_result(bn::BayesianNetwork, cpd::CPD)
-    if cpd in collect(keys(bn.cpds))
-        bn.cpds[cpd]
+    if cpd in collect(keys(cpds(bn)))
+        cpds(bn)[cpd]
     else
         false
     end
