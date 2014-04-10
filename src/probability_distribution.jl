@@ -48,19 +48,37 @@ function length(pd::PDistribution)
     length(pd.ps)
 end
 
-function getindex{K}(pd::PDistribution, key::K)
-    states(pd)::Array{K,1}
+function getindex{R,K}(pd::ProbabilityDistributionVector{R,K}, key::K)
+    !(key in states(pd)) ? throw("Invalid key") : nothing
 
-    if !(key in states(pd))
-        throw("Invalid key")
-    end
+    pd.ps[key .== states(pd)]
+end
 
-    if typeof(pd) <: ProbabilityDistributionVector
-        pd.ps[key .== states(pd)]
-    else
-        # is matrix
-        pd.ps[:,key .== states(pd)]
+function getindex{R,K,Q}(pd::ProbabilityDistributionMatrix{R,K,Q}, key::K)
+    s = states(pd)
+    !(key in s) ? throw("Invalid key") : nothing
+
+    pd.ps[:, key .== states(pd)]
+end
+
+function getindex{R,K,Q}(pd::ProbabilityDistributionMatrix{R,K,Q}, keys::Array{K,1})
+    s = states(pd)
+    for key in keys
+        !(key in s) ? throw("Invalid key") : nothing
     end
+    indencies = map(x -> findfirst(x,s), keys)
+
+    pd.ps[:, indencies]
+end
+
+function getindex{R,K}(pd::ProbabilityDistributionVector{R,K}, keys::Array{K,1})
+    s = states(pd)
+    for key in keys
+        !(key in s) ? throw("Invalid key") : nothing
+    end
+    indencies = map(x -> findfirst(s,x), keys)
+
+    pd.ps[indencies]
 end
 
 ## Later...
@@ -150,6 +168,8 @@ function *(p1::ProbabilityDistributionMatrix, p2::ProbabilityDistributionVector)
 end
 
 setify(x) = typeof(x) <: Set ? x : Set{typeof(x)}({x});
+desetify(arr::Array) = map(desetify, arr);
+desetify(x) = typeof(x) <: Set && length(x) == 1 ? collect(x)[1] : x;
     
 function /(p1::ProbabilityDistributionVector, p2::ProbabilityDistributionVector)
     s_p1 = map(setify, states(p1))
@@ -172,10 +192,9 @@ function /(p1::ProbabilityDistributionVector, p2::ProbabilityDistributionVector)
     _ps = zeros(FloatingPoint, length(_conditionals), length(_states))
 
     for (i,s) in enumerate(_states)
-
         idxs = indencies[s]
         p_s_p1 = p_p1[idxs][order_perm(c_p1[idxs], _conditionals)]
-        p_s_p2 = p_p2[order_perm(s_p2, _conditionals)]
+        p_s_p2 = p2[desetify(_conditionals)]
 
         _ps[:,i] = p_s_p1 ./ p_s_p2
     end
