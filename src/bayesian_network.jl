@@ -254,6 +254,10 @@ function cached_result(bn::BayesianNetwork, cpd::CPD)
 end
 
 function query(bn::BayesianNetwork, cpd::CPD)
+    query_naive_bayes(bn,cpd)
+end
+
+function query_naive_bayes(bn::BayesianNetwork, cpd::CPD)
     res = Dict()
     if legal_configuration(bn,cpd)
         if cached_result(bn,cpd) != false
