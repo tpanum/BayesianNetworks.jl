@@ -68,7 +68,7 @@ export
        P,
        valid_pdfs,
        isequal,
-       testquery
+       query
 
 
 end
