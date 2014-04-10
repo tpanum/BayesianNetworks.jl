@@ -284,26 +284,22 @@ function check_requirements(g::BayesianNetwork, cpd::CPD)
 end
 
 function _check_requirements(g::BayesianNetwork, cpd::CPD)
-    println("Check $cpd")
     if cpd_has_been_processed(g, cpd)
-        println("Derivable: $(cpd_derivable(g, cpd))")
         cpd_derivable(g, cpd)
     else
         if check_cpd(g, cpd)
             set_cpd_derivable!(g, cpd, true)
             true
         elseif cpd_is_processing(g, cpd)
-            println("Already processing")
             false
         else
             start_processing_cpd!(g, cpd)
 
             val = false
-            conds = conditionals(cpd)
+            conds = copy(conditionals(cpd))
             l_conds = length(conds)
-            dist = distribution(cpd)
+            dist = copy(distribution(cpd))
             l_dist = length(dist)
-            println("CHECK $cpd FROM INSIDE")
             # If there are conditionals, then try bayes rule
             if l_conds > 0 && check_bayes_rule(g, cpd)
                 val = true
@@ -321,9 +317,8 @@ function _check_requirements(g::BayesianNetwork, cpd::CPD)
 end
 
 function check_split_distribution(g::BayesianNetwork, cpd::CPD)
-    println("Trying split")
-    conds = conditionals(cpd)
-    dist = distribution(cpd)
+    conds = copy(conditionals(cpd))
+    dist = copy(distribution(cpd))
 
     new_dists = 0
     if length(dist) > 1
@@ -335,15 +330,11 @@ function check_split_distribution(g::BayesianNetwork, cpd::CPD)
 end
 
 function check_bayes_rule(g::BayesianNetwork, cpd::CPD)
-    println("Trying bayes")
-    conds = conditionals(cpd)
-    dist = distribution(cpd)
+    conds = copy(conditionals(cpd))
+    dist = copy(distribution(cpd))
 
     opposite = P(conds|dist)
-    println("Trying $opposite FROM bayes from $cpd")
     if _check_requirements(g, opposite)
-        println("Made $(P(conds)) FROM bayes from $cpd")
-        println("Made $(P(dist)) FROM bayes from $cpd")
         to_check = [P(conds), P(dist)]
         for i in to_check
             if !_check_requirements(g, i)
@@ -357,7 +348,6 @@ function check_bayes_rule(g::BayesianNetwork, cpd::CPD)
 end
 
 function check_joint_probability_distribution(bn::BayesianNetwork, cpd::CPD)
-    println("Trying joint")
     for d in distribution(cpd)
         node = find_node_by_symbol(bn, d)
         parent_labels = convert(Array{Symbol,1}, map(p -> p.label, in_neighbors(node, bn)))
