@@ -235,12 +235,6 @@ function _add_probability!(g::BayesianNetwork, cpd::CPD, pd)
     end
 end
 
-function joint_probability_distribution(bn::BayesianNetwork, cpd::CPD)
-    if length(conditionals(cpd)) == 0
-        [ P(d|in_neighbors(d)) for d in distribution(cpd) ]
-    end
-end
-
 multivecs{T}(::Type{T}, n::Int) = [T[] for _ =1:n]
 
 #################################################
@@ -290,26 +284,31 @@ function check_requirements(g::BayesianNetwork, cpd::CPD)
 end
 
 function _check_requirements(g::BayesianNetwork, cpd::CPD)
-    println("Check $cpd")
     if cpd_has_been_processed(g, cpd)
-        println("Derivable: $(cpd_derivable(g, cpd))")
         cpd_derivable(g, cpd)
     else
         if check_cpd(g, cpd)
             set_cpd_derivable!(g, cpd, true)
             true
         elseif cpd_is_processing(g, cpd)
-            println("Already processing")
             false
         else
             start_processing_cpd!(g, cpd)
 
             val = false
+            conds = conditionals(cpd)
+            l_conds = length(conds)
+            dist = distribution(cpd)
+            l_dist = length(dist)
+
             # If there are conditionals, then try bayes rule
-            if length(conditionals(cpd)) > 0 && check_bayes_rule(g, cpd)
+            if l_conds > 0 && check_bayes_rule(g, cpd)
                 val = true
-            # If there are more than one distribution, then try to split it
-            elseif length(distribution(cpd)) > 1 && check_split_distribution(g, cpd)
+            # If there are more than one distribution and there are conditionals, then try to split it
+            elseif l_dist > 1 && l_conds > 0 && check_split_distribution(g, cpd)
+                val = true
+            # If there are more than one distribution but no conditionals
+            elseif l_dist > 1 && l_conds == 0 && check_joint_probability_distribution(g, cpd)
                 val = true
             end
             set_cpd_derivable!(g, cpd, val)
@@ -319,7 +318,6 @@ function _check_requirements(g::BayesianNetwork, cpd::CPD)
 end
 
 function check_split_distribution(g::BayesianNetwork, cpd::CPD)
-    println("Trying split")
     conds = conditionals(cpd)
     dist = distribution(cpd)
 
@@ -333,7 +331,6 @@ function check_split_distribution(g::BayesianNetwork, cpd::CPD)
 end
 
 function check_bayes_rule(g::BayesianNetwork, cpd::CPD)
-    println("Trying bayes")
     conds = conditionals(cpd)
     dist = distribution(cpd)
 
@@ -349,6 +346,17 @@ function check_bayes_rule(g::BayesianNetwork, cpd::CPD)
     else
         false
     end
+end
+
+function check_joint_probability_distribution(bn::BayesianNetwork, cpd::CPD)
+    for d in distribution(cpd)
+        node = find_node_by_symbol(bn, d)
+        parent_labels = convert(Array{Symbol,1}, map(p -> p.label, in_neighbors(node, bn)))
+        if !_check_requirements(bn, P(d|parent_labels))
+            return false
+        end
+    end
+    true
 end
 
 function check_cpd(g::BayesianNetwork, cpd::CPD)
