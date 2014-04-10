@@ -29,6 +29,6 @@ end
 
 add_probability!(bn, P(:D), ProbabilityDistribution(["d1","d2","d_water"], [0.4,0.4,0.2]))
 testCPD = P(:D|Dict{Symbol,Any}({:a1 => 30, :a2 => 250}))
-aq = query(bn,testCPD)
+diagProbs = query(bn,testCPD)
 
 #bn.query(P(:D|{:a1 => 30, :a2 => 250, a_d_water_pdf => 0}))
