@@ -9,17 +9,20 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
     binclist::Array{Array{BayesianEdge,1},1}   #backward incidence list
 
     cpds::Dict{CPD,Any} ## Add types if needed
+    checked_cpds::Dict{CPD,Uint8} # Keep a list of having or not: 0 = not processed, 1 = being processed, 2 = not derivable, 3 = derivable
 
     function BayesianNetwork{V <: BayesianNode}(_nodes::Array{V,1}, _edges::Array{BayesianEdge,1})
         _nodes = convert(Array{BayesianNode,1}, _nodes)
         l_nodes = length(_nodes)
         _cpds=Dict{CPD, Any}()
+        _checked_cpds=Dict{CPD,Uint8}()
         if l_nodes > 0
             map(x -> assign_index(x[2],x[1]), enumerate(_nodes))
             for _n in _nodes
                 if has_pd(_n)
                     if length(probabilities(_n.pd)) > 0
-                        _cpds[CPD(_n.label)] = _n.pd
+                        _cpds[P(_n.label)] = _n.pd
+                        _checked_cpds[P(_n.label)] = 0
                     end
                 end
             end
@@ -27,7 +30,7 @@ type BayesianNetwork <: AbstractGraph{BayesianNode, BayesianEdge}
         if length(_edges) > 0
             map(x -> assign_index(x[2],x[1]), enumerate(_edges))
         end
-        b = new(_nodes, Array(BayesianEdge,0), multivecs(BayesianEdge, l_nodes), multivecs(BayesianEdge, l_nodes), _cpds)
+        b = new(_nodes, Array(BayesianEdge,0), multivecs(BayesianEdge, l_nodes), multivecs(BayesianEdge, l_nodes), _cpds, _checked_cpds)
         for edge in _edges
             add_edge!(b, edge)
         end
@@ -49,6 +52,57 @@ num_edges(g::BayesianNetwork) = length(edges(g))
 cpds(g::BayesianNetwork) = g.cpds
 num_cpds(g::BayesianNetwork) = length(cpds(g))
 
+checked_cpds(g::BayesianNetwork) = g.checked_cpds
+num_checked_cpds(g::BayesianNetwork) = length(calculated_cpds(g))
+
+function reset_checked_cpds!(g::BayesianNetwork)
+    for i in collect(keys(checked_cpds(g)))
+        checked_cpds(g)[i] = 0
+    end
+end
+
+function set_cpd_derivable!(g::BayesianNetwork, cpd::CPD, value::Bool)
+    v = value ? 3 : 2
+    checked_cpds(g)[cpd] = v
+end
+
+function cpd_derivable(g::BayesianNetwork, cpd::CPD)
+    if (check_checked_cpd(g, cpd))
+        checked_cpds(g)[cpd] == 3
+    else
+        false
+    end
+end
+
+function start_processing_cpd!(g::BayesianNetwork, cpd::CPD)
+    checked_cpds(g)[cpd] = 1
+end
+
+function cpd_is_processing(g::BayesianNetwork, cpd::CPD)
+    if check_checked_cpd(g, cpd)
+        checked_cpds(g)[cpd] == 1
+    else
+        false
+    end
+end
+
+function cpd_has_been_processed(g::BayesianNetwork, cpd::CPD)
+    if check_checked_cpd(g, cpd)
+        checked_cpds(g)[cpd] > 1
+    else
+        false
+    end
+end
+
+function check_checked_cpd(g::BayesianNetwork, cpd::CPD)
+    try
+        getindex(checked_cpds(g), cpd)
+        true
+    catch
+        false
+    end
+end
+
 function assign_index(g_elem, i::Int)
     if g_elem.index != 0
         throw("Attempting to reassign node")
@@ -57,16 +111,6 @@ function assign_index(g_elem, i::Int)
 end
 
 function add_node!{T <: BayesianNode}(g::BayesianNetwork, n::T)
-    ##Update what is put into the cpds dictionary when decided
-    if typeof(n) == DBayesianNode && has_pd(n)
-        g.cpds[CPD(n.label, [])] = n.pd
-        ##Check just made in case someone construct a graph in an non-obvious manner, will probably not be run
-        if length(in_edges(n, g)) > 0
-            g.cpds[CPD(n.label, [edge.source.label for edge in in_edges(n, g)])] = null
-        end
-    else
-        g.cpds[CPD(n.label, [   ])] = null
-    end
     assign_index(n, num_nodes(g) + 1)
 
     push!(g.nodes, n)
@@ -74,6 +118,17 @@ function add_node!{T <: BayesianNode}(g::BayesianNetwork, n::T)
     # Create entries for vertex in backward and forward incidence lists
     push!(g.finclist, Int[])
     push!(g.binclist, Int[])
+
+    ##Update what is put into the cpds dictionary when decided
+    if typeof(n) == DBayesianNode && has_pd(n)
+        add_probability!(g, P(n.label), n.pd)
+        ##Check just made in case someone construct a graph in an non-obvious manner, will probably not be run
+        if length(in_edges(n, g)) > 0
+            add_probability!(g, P(n.label|[edge.source.label for edge in in_edges(n, g)]))
+        end
+    else
+        add_probability!(g, P(n.label))
+    end
 
     n
 end
@@ -167,18 +222,16 @@ end
 out_degree{V <: BayesianNode}(n::V, g::BayesianNetwork) = length(out_edges(n, g))
 out_neighbors{V <: BayesianNode}(n::V, g::BayesianNetwork) = map(e -> e.target, out_edges(n, g))
 
-function add_probability!{V <: PDistribution}(g::BayesianNetwork, cpd::CPD, pd::V)
+add_probability!{V <: PDistribution}(g::BayesianNetwork, cpd::CPD, pd::V) = _add_probability!(g, cpd, pd)
+add_probability!(g::BayesianNetwork, cpd::CPD) = _add_probability!(g, cpd, nothing)
+
+function _add_probability!(g::BayesianNetwork, cpd::CPD, pd)
     if symbols_in_network(g, distribution(cpd)) && symbols_in_network(g, conditionals(cpd))
         g.cpds[cpd] = pd
+        checked_cpds(g)[cpd] = 0
         true
     else
         false
-    end
-end
-
-function joint_probability_distribution(bn::BayesianNetwork, cpd::CPD)
-    if length(conditionals(cpd)) == 0
-        [ P(d|in_neighbors(d)) for d in distribution(cpd) ]
     end
 end
 
@@ -226,20 +279,89 @@ gather_nodes_by_edge_in(edges::Array{BayesianEdge,1}) = Set(map(edge -> edge.sou
 gather_nodes_by_edge_out(edges::Array{BayesianEdge,1}) = Set(map(edge -> edge.target, edges))
 
 function check_requirements(g::BayesianNetwork, cpd::CPD)
-    conds = conditionals(cpd)
-    dist = distribution(cpd)
-    to_check = [P(conds|dist), P(conds), P(dist)]
-    for i in to_check
-        if get_cpd(g, i) == false
+    reset_checked_cpds!(g)
+    _check_requirements(g, cpd)
+end
+
+function _check_requirements(g::BayesianNetwork, cpd::CPD)
+    if cpd_has_been_processed(g, cpd)
+        cpd_derivable(g, cpd)
+    else
+        if check_cpd(g, cpd)
+            set_cpd_derivable!(g, cpd, true)
+            true
+        elseif cpd_is_processing(g, cpd)
+            false
+        else
+            start_processing_cpd!(g, cpd)
+
+            val = false
+            conds = copy(conditionals(cpd))
+            l_conds = length(conds)
+            dist = copy(distribution(cpd))
+            l_dist = length(dist)
+            # If there are conditionals, then try bayes rule
+            if l_conds > 0 && check_bayes_rule(g, cpd)
+                val = true
+            # If there are more than one distribution and there are conditionals, then try to split it
+            elseif l_dist > 1 && l_conds > 0 && check_split_distribution(g, cpd)
+                val = true
+            # If there are more than one distribution but no conditionals
+            elseif l_dist > 1 && l_conds == 0 && check_joint_probability_distribution(g, cpd)
+                val = true
+            end
+            set_cpd_derivable!(g, cpd, val)
+            val
+        end
+    end
+end
+
+function check_split_distribution(g::BayesianNetwork, cpd::CPD)
+    conds = copy(conditionals(cpd))
+    dist = copy(distribution(cpd))
+
+    new_dists = 0
+    if length(dist) > 1
+        new_dists = splice!(dist, 2:length(dist))
+    else
+        throw("Length of distribution must be larger than 1.")
+    end
+    _check_requirements(g, P(new_dists|conds)) && _check_requirements(g, P(dist|conds))
+end
+
+function check_bayes_rule(g::BayesianNetwork, cpd::CPD)
+    conds = copy(conditionals(cpd))
+    dist = copy(distribution(cpd))
+
+    opposite = P(conds|dist)
+    if _check_requirements(g, opposite)
+        to_check = [P(conds), P(dist)]
+        for i in to_check
+            if !_check_requirements(g, i)
+                return false
+            end
+        end
+        true
+    else
+        false
+    end
+end
+
+function check_joint_probability_distribution(bn::BayesianNetwork, cpd::CPD)
+    for d in distribution(cpd)
+        node = find_node_by_symbol(bn, d)
+        parent_labels = convert(Array{Symbol,1}, map(p -> p.label, in_neighbors(node, bn)))
+        if !_check_requirements(bn, P(d|parent_labels))
             return false
         end
     end
     true
 end
 
-function get_cpd(g::BayesianNetwork, cpd::CPD)
+function check_cpd(g::BayesianNetwork, cpd::CPD)
     try
-        getindex(cpds(g),cpd)
+        getindex(cpds(g), cpd)
+        true
     catch
         false
     end
@@ -253,17 +375,21 @@ function cached_result(bn::BayesianNetwork, cpd::CPD)
     end
 end
 
-function testquery(bn::BayesianNetwork, cpd::CPD)
+function query(bn::BayesianNetwork, cpd::CPD)
+    query_naive_bayes(bn,cpd)
+end
+
+function query_naive_bayes(bn::BayesianNetwork, cpd::CPD)
     res = Dict()
     if legal_configuration(bn,cpd)
         if cached_result(bn,cpd) != false
-            res = cached_result(bn,cpd) 
+            res = cached_result(bn,cpd)
         elseif check_requirements(bn, cpd)
             res = calculate_probabilities(bn,cpd)
         else
             throw("Invalid configuration")
         end
-    end 
+    end
     res
 end
 
@@ -274,9 +400,18 @@ function calculate_probabilities(bn::BayesianNetwork, cpd::CPD)
         calculate_probability!(res, cached_result(bn, p), cpd.parameters[p.distribution[1]])
     end
     for key in keys(res)
-        res[key] = prod(res[key])
+        res[key] =  get_probability(bn, find_node_by_symbol(bn,cpd.distribution[1]), key)*prod(res[key])
     end
     res
+end
+
+function get_probability(bn::BayesianNetwork, node::BayesianNode, state)
+    pd = cached_result(bn, P(node.label))
+    if state in states(pd)
+        probabilities(pd)[findfirst(states(pd),state)]
+    else
+        throw("State not in node")
+    end
 end
 
 function create_probabilities(cpd::CPD)

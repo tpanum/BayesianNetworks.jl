@@ -157,6 +157,6 @@ add_probability!(nbhs1, P(:R|:S), ProbabilityDistribution(["head", "tails"], [0.
 
 @test check_requirements(nbhs1, P(:D|[:R,:S])) == false
 add_probability!(nbhs1, P([:R,:S]|:D), ProbabilityDistribution(["head", "tails"], [0.20, 0.80]))
-@test check_requirements(nbhs1, P(:D|[:R,:S])) == false
+@test check_requirements(nbhs1, P(:D|[:R,:S])) == true
 add_probability!(nbhs1, P([:R,:S]), ProbabilityDistribution(["head", "tails"], [0.40, 0.60]))
 @test check_requirements(nbhs1, P(:D|[:R,:S])) == true
