@@ -376,7 +376,11 @@ function cached_result(bn::BayesianNetwork, cpd::CPD)
     end
 end
 
-function testquery(bn::BayesianNetwork, cpd::CPD)
+function query(bn::BayesianNetwork, cpd::CPD)
+    query_naive_bayes(bn,cpd)
+end
+
+function query_naive_bayes(bn::BayesianNetwork, cpd::CPD)
     res = Dict()
     if legal_configuration(bn,cpd)
         if cached_result(bn,cpd) != false
@@ -384,7 +388,8 @@ function testquery(bn::BayesianNetwork, cpd::CPD)
         elseif check_requirements(bn, cpd)
             res = calculate_probabilities(bn,cpd)
         else
-            throw("Invalid configuration")
+            res = calculate_probabilities(bn,cpd)
+            #throw("Invalid configuration")
         end
     end
     res
@@ -397,9 +402,18 @@ function calculate_probabilities(bn::BayesianNetwork, cpd::CPD)
         calculate_probability!(res, cached_result(bn, p), cpd.parameters[p.distribution[1]])
     end
     for key in keys(res)
-        res[key] = prod(res[key])
+        res[key] =  get_probability(bn, find_node_by_symbol(bn,cpd.distribution[1]), key)*prod(res[key])
     end
     res
+end
+
+function get_probability(bn::BayesianNetwork, node::BayesianNode, state)
+    pd = cached_result(bn, P(node.label))
+    if state in states(pd)
+        probabilities(pd)[findfirst(states(pd),state)]
+    else
+        throw("State not in node")
+    end
 end
 
 function create_probabilities(cpd::CPD)
