@@ -148,3 +148,37 @@ function *(p1::ProbabilityDistributionMatrix, p2::ProbabilityDistributionVector)
 
     ProbabilityDistribution(zip_sets(l_p1_sets, l_p2_elems), sorted_ps)
 end
+
+setify(x) = typeof(x) <: Set ? x : Set{typeof(x)}({x});
+    
+function /(p1::ProbabilityDistributionVector, p2::ProbabilityDistributionVector)
+    s_p1 = map(setify, states(p1))
+    s_p2 = map(setify, states(p2))
+    p_p1 = probabilities(p1)
+    p_p2 = probabilities(p2)
+
+    unique_s_p2 = reduce(union, s_p2)
+    raw_states = map(x -> copy(setdiff(x, unique_s_p2)), s_p1)
+    _states = unique(raw_states)
+    _u_s = reduce(union, _states)
+
+    c_p1 = map(x -> copy(setdiff(x, _u_s)), s_p1)
+
+    _conditionals = unique(c_p1)
+
+    indencies=Dict(_states, fill(Integer[],length(_states)))
+    map(x -> indencies[x[2]] = [indencies[x[2]], x[1]], enumerate(raw_states))
+
+    _ps = zeros(FloatingPoint, length(_conditionals), length(_states))
+
+    for (i,s) in enumerate(_states)
+
+        idxs = indencies[s]
+        p_s_p1 = p_p1[idxs][order_perm(c_p1[idxs], _conditionals)]
+        p_s_p2 = p_p2[order_perm(s_p2, _conditionals)]
+
+        _ps[:,i] = p_s_p1 ./ p_s_p2
+    end
+
+    ProbabilityDistribution(_states, _ps, _conditionals)
+end

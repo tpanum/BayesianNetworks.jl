@@ -40,3 +40,5 @@ function single_to_multi_index(i::Integer, dims::(Integer,Integer))
     dim1, dim2 = dims
     convert(Integer,ceil(i/dim1)), i%dim1 > 0 ? i%dim1 : dim1
 end
+
+order_perm(A1::Array, A2::Array) = map(x -> findfirst(A1,x), A2)

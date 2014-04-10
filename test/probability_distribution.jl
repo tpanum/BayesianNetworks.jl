@@ -78,3 +78,6 @@ pd_q3=pd11*pd12
 @test_approx_eq 0.1 pd_q3[Set{ASCIIString}({"y1","x1"})]
 @test_approx_eq 0.18 pd_q3[Set{ASCIIString}({"y2","x1"})]
 @test_approx_eq 0.115 pd_q3[Set{ASCIIString}({"y3","x1"})]
+@test typeof(probabilities(pd_q3)) == Array{Float64,1}
+
+@test_approx_eq probabilities(pd_q3/pd12) probabilities(pd11)
