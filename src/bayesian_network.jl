@@ -370,7 +370,24 @@ end
 has_cached_result(bn::BayesianNetwork, cpd::CPD) = cpd in collect(keys(cpds(bn))) ? true : false;
 
 function query(bn::BayesianNetwork, cpd::CPD)
-    query_naive_bayes(bn,cpd)
+    if is_naive_bayes_model(bn, cpd)
+        query_naive_bayes(bn,cpd)
+    else
+        throw("Form of cpd not supported by query at the moment")
+    end
+end
+
+function is_naive_bayes_model(bn::BayesianNetwork, cpd::CPD)
+    if typeof(find_node_by_symbol(bn,distribution(cpd)[1])) == DBayesianNode
+        for label in conditionals(cpd)
+            if !(typeof(find_node_by_symbol(bn, label)) == CBayesianNode)
+                return false
+            end
+        end
+    else
+        false
+    end
+    true
 end
 
 function query_naive_bayes(bn::BayesianNetwork, cpd::CPD)

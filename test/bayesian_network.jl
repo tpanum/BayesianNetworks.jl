@@ -159,3 +159,42 @@ add_probability!(nbhs1, P([:R,:S]|:D), ProbabilityDistribution(["head", "tails"]
 @test check_requirements(nbhs1, P(:D|[:R,:S])) == true
 add_probability!(nbhs1, P([:R,:S]), ProbabilityDistribution(["head", "tails"], [0.40, 0.60]))
 @test check_requirements(nbhs1, P(:D|[:R,:S])) == true
+
+####################################
+## Test query
+####################################
+
+DB=DBayesianNode(:D, ["d1","d2","d_water"])
+
+an1=CBayesianNode(:a1)
+an2=CBayesianNode(:a2)
+an3=CBayesianNode(:a3)
+
+bn1=BayesianNetwork([DB,an1,an2,an3])
+
+add_edge!(bn1,DB,an1)
+add_edge!(bn1,DB,an2)
+add_edge!(bn1,DB,an3)
+
+analysis=[an1,an2,an3]
+
+# Distributions
+using Distributions
+
+for a in analysis
+    a_d1_dist = Normal(1, 0.2)
+    a_d2_dist = Normal(10, 0.2)
+
+    samples = [ rand(dist) for i=1:100, dist in [a_d1_dist, a_d2_dist] ]
+
+    a_d_water_pdf = x -> 1/(maximum(samples) - minimum(samples))
+
+    add_probability!(bn1, P(a.label|:D), ProbabilityDensityDistribution(states(DB), [x -> 1, x -> 1, a_d_water_pdf]))
+end
+
+add_probability!(bn1, P(:D), ProbabilityDistribution(["d1","d2","d_water"], [0.4,0.4,0.2]))
+testCPD1 = P(:D|Dict{Symbol,Any}({:a1 => 30, :a2 => 250}))
+diagProbs1 = query(bn1,testCPD1)
+@test diagProbs1["d1"] == 0.4
+@test diagProbs1["d2"] == 0.4
+
