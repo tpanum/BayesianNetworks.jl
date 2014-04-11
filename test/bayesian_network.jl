@@ -22,7 +22,7 @@ oe1 = out_edges(a1, n1)
 
 add_node!(n1, a1)
 
-@test cached_result(n1,P(:hulu)) == pd1
+@test has_cached_result(n1,P(:hulu)) == true
 @test length(n1.binclist) == 1
 @test length(n1.finclist) == 1
 
@@ -131,10 +131,9 @@ add_edge!(n4,d1,d5)
 @test legal_configuration(n4, CPD([:d2,:d3], [:d4])) == false
 @test legal_configuration(n4, CPD([:d2], [:d4, :d1])) == false
 
-@test cached_result(n4, P(:d1)) != false
-@test cached_result(n4, P(:d9)) == false
-@test cached_result(n4, P(:d1|:d2)) == false
-@test cached_result(n4, P(:d4|:d2)) == false
+@test has_cached_result(n4, P(:d9)) == false
+@test has_cached_result(n4, P(:d1|:d2)) == false
+@test has_cached_result(n4, P(:d4|:d2)) == false
 
 ####################################
 

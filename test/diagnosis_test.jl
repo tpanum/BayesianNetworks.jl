@@ -17,7 +17,7 @@ analysis=[a1,a2,a3]
 using Distributions
 
 for a in analysis
-    a_d1_dist = Normal(rand(1:200), rand(1:15))
+    a_d1_dist = Normal(30, rand(1:15))
     a_d2_dist = Normal(rand(200:400), rand(1:15))
 
     samples = [ rand(dist) for i=1:100, dist in [a_d1_dist, a_d2_dist] ]
@@ -28,7 +28,7 @@ for a in analysis
 end
 
 add_probability!(bn, P(:D), ProbabilityDistribution(["d1","d2","d_water"], [0.4,0.4,0.2]))
-testCPD = P(:D|Dict{Symbol,Any}({:a1 => 30, :a2 => 250}))
+testCPD = P(:D|Dict{Symbol,Any}({:a1 => 30, :a2 => 30}))
 diagProbs = query(bn,testCPD)
 
 #bn.query(P(:D|{:a1 => 30, :a2 => 250, a_d_water_pdf => 0}))

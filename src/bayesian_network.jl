@@ -367,37 +367,27 @@ function check_cpd(g::BayesianNetwork, cpd::CPD)
     end
 end
 
-function cached_result(bn::BayesianNetwork, cpd::CPD)
-    if cpd in collect(keys(cpds(bn)))
-        cpds(bn)[cpd]
-    else
-        false
-    end
-end
+has_cached_result(bn::BayesianNetwork, cpd::CPD) = cpd in collect(keys(cpds(bn))) ? true : false;
 
 function query(bn::BayesianNetwork, cpd::CPD)
     query_naive_bayes(bn,cpd)
 end
 
 function query_naive_bayes(bn::BayesianNetwork, cpd::CPD)
-    res = Dict()
-    if legal_configuration(bn,cpd)
-        if cached_result(bn,cpd) != false
-            res = cached_result(bn,cpd)
-        elseif check_requirements(bn, cpd)
-            res = calculate_probabilities(bn,cpd)
-        else
-            throw("Invalid configuration")
-        end
+    if !legal_configuration(bn,cpd)
+        throw("Invaled configuration")
+    elseif has_cached_result(bn,cpd)
+        cpds(bn)[cpd]
+    elseif check_requirements(bn, cpd)
+        calculate_probabilities(bn,cpd)
     end
-    res
 end
 
 function calculate_probabilities(bn::BayesianNetwork, cpd::CPD)
     res = Dict()
     temp = create_probabilities(cpd)
     for p in temp
-        calculate_probability!(res, cached_result(bn, p), cpd.parameters[p.distribution[1]])
+        has_cached_result(bn, p) ? calculate_probability!(res, cpds(bn)[p], cpd.parameters[p.distribution[1]]) : nothing;
     end
     for key in keys(res)
         res[key] =  get_probability(bn, find_node_by_symbol(bn,cpd.distribution[1]), key)*prod(res[key])
@@ -405,22 +395,9 @@ function calculate_probabilities(bn::BayesianNetwork, cpd::CPD)
     res
 end
 
-function get_probability(bn::BayesianNetwork, node::BayesianNode, state)
-    pd = cached_result(bn, P(node.label))
-    if state in states(pd)
-        probabilities(pd)[findfirst(states(pd),state)]
-    else
-        throw("State not in node")
-    end
-end
+get_probability(bn::BayesianNetwork, node::BayesianNode, state) = has_cached_result(bn, P(node.label)) ? cpds(bn)[P(node.label)][state] : throw("Node mismatch");
 
-function create_probabilities(cpd::CPD)
-    res = Array(CPD,0)
-    for cond in cpd.conditionals
-        push!(res, CPD(cond,cpd.distribution))
-    end
-    res
-end
+create_probabilities(cpd::CPD) = map(cond -> CPD(cond,cpd.distribution), cpd.conditionals)
 
 function calculate_probability!(dict, dist::ProbabilityDensityDistribution, v)
     for state in states(dist)
