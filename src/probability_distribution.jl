@@ -2,8 +2,8 @@ import Base.length
 
 abstract PDistribution
 
-check_pd_sum!{N <: Real}(_ps::Array{N,1}) = sum(_ps) != 1 ? throw("Probability Distributions must sum to 1") : true;
-check_pd_sum!{N <: Real}(_ps::Array{N,2}) = sum(_ps) != size(_ps,1) ? throw("Conditional Probability Distributions must consist of probability distributions which sum to 1") : true;
+check_pd_sum!{N <: Real}(_ps::Array{N,1}) = !isapprox(sum(_ps), 1) ? throw("Probability Distributions must sum to 1 (got $(sum(_ps)))") : true;
+check_pd_sum!{N <: Real}(_ps::Array{N,2}) = !isapprox(sum(_ps), size(_ps,1)) ? throw("Conditional Probability Distributions must consist of probability distributions which sum to 1") : true;
 check_unique!(s1) = !(length(s1) == length(unique(s1))) ? throw("States must be unique") : true;
 
 type ProbabilityDistributionVector{T <: Real, K} <: PDistribution
