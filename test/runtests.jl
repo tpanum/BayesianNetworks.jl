@@ -23,3 +23,5 @@ add_test_package("bayesian_network.jl")
 add_test_package("bayesian_edge.jl")
 add_test_package("probability_density_distribution.jl")
 add_test_package("diagnosis_test.jl")
+
+include("benchmarking/benchmark.jl")
