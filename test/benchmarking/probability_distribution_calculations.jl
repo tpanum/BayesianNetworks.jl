@@ -17,5 +17,5 @@ for i=1:amount_of_operations
     div_time += @elapsed res/pd2
 end
 
-println("Average time to compute the multiplication product between a 3x2 PD and a 3x1 PD: $(prod_time/amount_of_operations)s")
-println("Average time to compute divition product between a 3x2 PD and a 3x1 PD: $(div_time/amount_of_operations)s")
+println("Average time to compute the multiplication product between a 3x2 PD and a 3x1 PD: $(prod_time/amount_of_operations*1000)ms")
+println("Average time to compute divition product between a 3x2 PD and a 3x1 PD: $(div_time/amount_of_operations*1000)ms")
