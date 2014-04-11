@@ -412,7 +412,7 @@ function calculate_probabilities(bn::BayesianNetwork, cpd::CPD)
     res
 end
 
-get_probability(bn::BayesianNetwork, node::BayesianNode, state) = has_cached_result(bn, P(node.label)) ? cpds(bn)[P(node.label)][state] : throw("Node mismatch");
+get_probability(bn::BayesianNetwork, node::BayesianNode, state) = has_cached_result(bn, P(node.label)) ? cpds(bn)[P(node.label)][state][1] : throw("Node mismatch");
 
 create_probabilities(cpd::CPD) = map(cond -> CPD(cond,cpd.distribution), cpd.conditionals)
 
