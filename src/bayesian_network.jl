@@ -400,7 +400,7 @@ function calculate_probabilities(bn::BayesianNetwork, cpd::CPD)
         calculate_probability!(res, cached_result(bn, p), cpd.parameters[p.distribution[1]])
     end
     for key in keys(res)
-        res[key] =  get_probability(bn, find_node_by_symbol(bn,cpd.distribution[1]), key)*prod(res[key])
+        res[key] = get_probability(bn, find_node_by_symbol(bn,cpd.distribution[1]), key)*prod(res[key])
     end
     res
 end
@@ -414,13 +414,7 @@ function get_probability(bn::BayesianNetwork, node::BayesianNode, state)
     end
 end
 
-function create_probabilities(cpd::CPD)
-    res = Array(CPD,0)
-    for cond in cpd.conditionals
-        push!(res, CPD(cond,cpd.distribution))
-    end
-    res
-end
+create_probabilities(cpd::CPD) = map(c -> P(c|cpd.distribution), cpd.conditionals)
 
 function calculate_probability!(dict, dist::ProbabilityDensityDistribution, v)
     for state in states(dist)
