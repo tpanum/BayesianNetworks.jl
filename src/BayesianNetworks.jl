@@ -51,7 +51,7 @@ export
        add_probability!,
        legal_configuration,
        check_requirements,
-       cached_result,
+       has_cached_result,
 
        PDistribution,
        UnknownPDistribution,
