@@ -193,8 +193,9 @@ for a in analysis
 end
 
 add_probability!(bn1, P(:D), ProbabilityDistribution(["d1","d2","d_water"], [0.4,0.4,0.2]))
+
 testCPD1 = P(:D|Dict{Symbol,Any}({:a1 => 30, :a2 => 250}))
 diagProbs1 = query(bn1,testCPD1)
+
 @test_approx_eq diagProbs1["d1"] 0.4
 @test_approx_eq diagProbs1["d2"] 0.4
-
